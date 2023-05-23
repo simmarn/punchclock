@@ -1,7 +1,8 @@
-package punchclock
+package punchclock_test
 
 import (
 	"os"
+	"simmarn/punchclock"
 	"testing"
 	"time"
 
@@ -23,7 +24,7 @@ func TestMain(m *testing.M) {
 func Test_Work_WorkEndedUpdated(t *testing.T) {
 	assert := assert.New(t)
 	initialdata := CreateWorkDay(time.Now().Add(-time.Hour))
-	pc := NewPunchClockFromData(*initialdata)
+	pc := punchclock.NewPunchClockFromData(*initialdata)
 	assert.Equal(pc.GetCurrentWorkDay().WorkEnded, pc.GetCurrentWorkDay().WorkStarted)
 
 	pc.Work()
@@ -34,7 +35,7 @@ func Test_Work_WorkEndedUpdated(t *testing.T) {
 func Test_Work_NewDay_WorkEndedUpdatedWithNewDate(t *testing.T) {
 	assert := assert.New(t)
 	initialdata := CreateWorkDay(time.Now().Add(-time.Hour * 24))
-	pc := NewPunchClockFromData(*initialdata)
+	pc := punchclock.NewPunchClockFromData(*initialdata)
 
 	pc.Work()
 
@@ -47,7 +48,7 @@ func Test_Work_NewDay_WorkEndedUpdatedWithNewDate(t *testing.T) {
 func Test_Pause_PauseSaved(t *testing.T) {
 	assert := assert.New(t)
 	initialdata := CreateWorkDay(time.Now().Add(-time.Hour))
-	pc := NewPunchClockFromData(*initialdata)
+	pc := punchclock.NewPunchClockFromData(*initialdata)
 
 	pc.Pause()
 
@@ -69,12 +70,12 @@ func Test_Pause_PauseSaved(t *testing.T) {
 	assert.Equal(2, len(pc.GetCurrentWorkDay().Pauses))
 }
 
-func CreateWorkDay(initTime time.Time) *WorkDay {
+func CreateWorkDay(initTime time.Time) *punchclock.WorkDay {
 	started := initTime
-	today := new(WorkDay)
+	today := new(punchclock.WorkDay)
 	today.WorkStarted = started
 	today.WorkEnded = started
-	pauseSlice := make([]WorkPause, 0)
+	pauseSlice := make([]punchclock.WorkPause, 0)
 	today.Pauses = pauseSlice
 	return today
 }
