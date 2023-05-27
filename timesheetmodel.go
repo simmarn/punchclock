@@ -16,8 +16,10 @@ func NewTimesheetModel(records []WorkDayRecord) *TimesheetModel {
 }
 
 func (ts *TimesheetModel) GetToday() WorkDay {
-	if IsSameDay(time.Now(), ts.records[len(ts.records)-1].WorkDay.WorkStarted) {
-		return ts.records[len(ts.records)-1].WorkDay
+	if len(ts.records) > 0 {
+		if IsSameDay(time.Now(), ts.records[len(ts.records)-1].WorkDay.WorkStarted) {
+			return ts.records[len(ts.records)-1].WorkDay
+		}
 	}
 	return *NewWorkDay(time.Now())
 }

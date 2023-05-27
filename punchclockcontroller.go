@@ -1,5 +1,10 @@
 package punchclock
 
+import (
+	"fmt"
+	"os"
+)
+
 type PunchclockController struct {
 	storage    RecordStorage
 	punchclock *PunchClock
@@ -40,4 +45,13 @@ func (c *PunchclockController) GetPrevious() []WorkDayRecord {
 
 func (c *PunchclockController) Refresh() {
 	c.Model.CurrentMonth = *NewWorkDayModelSlice(c.timesheet.GetCurrentMonth())
+}
+
+func CheckIfError(err error) {
+	if err == nil {
+		return
+	}
+
+	fmt.Printf("\x1b[31;1m%s\x1b[0m\n", fmt.Sprintf("error: %s", err))
+	os.Exit(1)
 }
