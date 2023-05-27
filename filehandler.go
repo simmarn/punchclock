@@ -2,8 +2,14 @@ package punchclock
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 )
+
+type RecordStorage interface {
+	Save(records []WorkDayRecord) error
+	Load() ([]WorkDayRecord, error)
+}
 
 type FileHandler struct {
 	filepath string
@@ -15,7 +21,7 @@ func NewFileHandler(filepath string) *FileHandler {
 	return fh
 }
 
-func (fh *FileHandler) SaveToFile(records []WorkDayRecord) error {
+func (fh *FileHandler) Save(records []WorkDayRecord) error {
 	recordsJson, err := json.Marshal(records)
 	if err != nil {
 		return err
@@ -24,15 +30,21 @@ func (fh *FileHandler) SaveToFile(records []WorkDayRecord) error {
 	return err
 }
 
-func (fh *FileHandler) LoadFromFile() ([]WorkDayRecord, error) {
-	recordsJson, err := os.ReadFile(fh.filepath)
-	if err != nil {
+func (fh *FileHandler) Load() ([]WorkDayRecord, error) {
+	if _, err := os.Stat(fh.filepath); err == nil {
+		recordsJson, err := os.ReadFile(fh.filepath)
+		if err != nil {
+			return nil, err
+		}
+		records := []WorkDayRecord{}
+		err = json.Unmarshal(recordsJson, &records)
+		if err != nil {
+			return nil, err
+		}
+		return records, nil
+	} else if errors.Is(err, os.ErrNotExist) {
+		return nil, nil
+	} else {
 		return nil, err
 	}
-	records := []WorkDayRecord{}
-	err = json.Unmarshal(recordsJson, &records)
-	if err != nil {
-		return nil, err
-	}
-	return records, nil
 }

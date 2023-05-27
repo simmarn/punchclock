@@ -13,12 +13,12 @@ func TestFileHandler_SaveToFile(t *testing.T) {
 	records := CreateRecordsForTest()
 
 	fh := punchclock.NewFileHandler("testrecords.json")
-	err := fh.SaveToFile(records)
+	err := fh.Save(records)
 	if err != nil {
 		t.Fatalf(`Did not expect %v`, err)
 	}
 
-	loadedRecords, err := fh.LoadFromFile()
+	loadedRecords, err := fh.Load()
 	if err != nil {
 		t.Fatalf(`Did not expect %v`, err)
 	}
