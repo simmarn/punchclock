@@ -4,6 +4,16 @@ import (
 	"time"
 )
 
+func CalculateWorkDay(workday WorkDay) WorkDayRecord {
+	record := WorkDayRecord{}
+	record.WorkDay = workday
+	for _, pause := range workday.Pauses {
+		record.PauseTime = record.PauseTime + (pause.End.Sub(pause.Start))
+	}
+	record.WorkingTime = workday.WorkEnded.Sub(record.WorkDay.WorkStarted) - record.PauseTime
+	return record
+}
+
 type PunchClock struct {
 	today        WorkDay
 	yesterday    WorkDay

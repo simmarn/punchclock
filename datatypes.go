@@ -1,10 +1,12 @@
 package punchclock
 
-import "time"
+import (
+	"time"
+)
 
 type WorkPause struct {
-	Start time.Time
-	End   time.Time
+	Start time.Time `json:"Start"`
+	End   time.Time `json:"End"`
 }
 
 func NewWorkPause() WorkPause {
@@ -12,9 +14,9 @@ func NewWorkPause() WorkPause {
 }
 
 type WorkDay struct {
-	WorkStarted time.Time
-	WorkEnded   time.Time
-	Pauses      []WorkPause
+	WorkStarted time.Time   `json:"WorkStarted"`
+	WorkEnded   time.Time   `json:"WorkEnded"`
+	Pauses      []WorkPause `json:"Pauses"`
 }
 
 func NewWorkDay(startTime time.Time) *WorkDay {
@@ -26,17 +28,7 @@ func NewWorkDay(startTime time.Time) *WorkDay {
 }
 
 type WorkDayRecord struct {
-	WorkDay     WorkDay
-	WorkingTime time.Duration
-	PauseTime   time.Duration
-}
-
-func CalculateWorkDay(workday WorkDay) WorkDayRecord {
-	record := WorkDayRecord{}
-	record.WorkDay = workday
-	for _, pause := range workday.Pauses {
-		record.PauseTime = record.PauseTime + (pause.End.Sub(pause.Start))
-	}
-	record.WorkingTime = workday.WorkEnded.Sub(record.WorkDay.WorkStarted) - record.PauseTime
-	return record
+	WorkDay     WorkDay       `json:"WorkDay"`
+	WorkingTime time.Duration `json:"WorkingTime"`
+	PauseTime   time.Duration `json:"PauseTime"`
 }
