@@ -1,8 +1,13 @@
 package punchclock
 
+import (
+	"fmt"
+	"time"
+)
+
 const (
 	YYYYMMDD  = "2006-01-02"
-	HHMMSS24h = "15:04:05"
+	HHMMSS24h = "15:04"
 )
 
 type WorkDayModel struct {
@@ -30,9 +35,26 @@ func (m *WorkDayModel) End() string {
 }
 
 func (m *WorkDayModel) Pause() string {
-	return m.workday.PauseTime.String()
+	return fmtDuration(m.workday.PauseTime)
 }
 
 func (m *WorkDayModel) WorkingTime() string {
-	return m.workday.WorkingTime.String()
+	return fmtDurationDecimal(m.workday.WorkingTime)
+	//return m.workday.WorkingTime.String()
+}
+
+func fmtDuration(d time.Duration) string {
+	d = d.Round(time.Minute)
+	h := d / time.Hour
+	d -= h * time.Hour
+	m := d / time.Minute
+	return fmt.Sprintf("%02d:%02d", h, m)
+}
+
+func fmtDurationDecimal(d time.Duration) string {
+	d = d.Round(time.Minute)
+	h := d / time.Hour
+	d -= h * time.Hour
+	m := d / time.Minute
+	return fmt.Sprintf("%02d,%02d", h, 100*m/60)
 }

@@ -8,53 +8,97 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+const (
+	COLUMNS = 5
+)
+
 type MainWindowView struct {
 	controller *PunchclockController
 	model      *PunchclockModel
 	mainWindow fyne.Window
+	table      fyne.Widget
 }
 
 func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowView {
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Punchclock")
-	headerLabel := widget.NewLabel("Current working time")
+	headerLabel := widget.NewLabel("Punchclock Timesheet")
 
-	contentContainer := widget.NewTable(
+	table := widget.NewTable(
 		func() (int, int) {
-			return len(m.CurrentMonth), 5
+			return len(m.CurrentMonth) + 1, COLUMNS
 		},
 		func() fyne.CanvasObject {
-			return widget.NewLabel("placeholder")
+			label := widget.NewLabel("placeholder")
+			label.Alignment = fyne.TextAlignCenter
+			return label
 		},
 		func(tci widget.TableCellID, co fyne.CanvasObject) {
-
 			var text string
-			switch tci.Col {
-			case 0:
-				text = m.CurrentMonth[tci.Row].Day()
-			case 1:
-				text = m.CurrentMonth[tci.Row].Start()
-			case 2:
-				text = m.CurrentMonth[tci.Row].End()
-			case 3:
-				text = m.CurrentMonth[tci.Row].Pause()
-			case 4:
-				text = m.CurrentMonth[tci.Row].WorkingTime()
+			if tci.Row == 0 {
+				switch tci.Col {
+				case 0:
+					text = "Date"
+				case 1:
+					text = "Arrived"
+				case 2:
+					text = "Left"
+				case 3:
+					text = "Break Time"
+				case 4:
+					text = "Work Time"
+				}
+				co.(*widget.Label).TextStyle.Bold = true
+			} else {
+				row := tci.Row - 1
+
+				switch tci.Col {
+				case 0:
+					text = m.CurrentMonth[row].Day()
+				case 1:
+					text = m.CurrentMonth[row].Start()
+				case 2:
+					text = m.CurrentMonth[row].End()
+				case 3:
+					text = m.CurrentMonth[row].Pause()
+				case 4:
+					text = m.CurrentMonth[row].WorkingTime()
+				}
 			}
 			co.(*widget.Label).SetText(text)
 		})
-	scrollableContent := container.NewScroll(contentContainer)
-	scrollableContent.SetMinSize(fyne.NewSize(1200, 400))
+	scrollableContent := container.NewScroll(table)
+	scrollableContent.SetMinSize(fyne.NewSize(COLUMNS*94, 300))
+	refreshButton := widget.NewButton("Work", nil)
+	pauseButton := widget.NewButton("Pause", nil)
+	buttonContainer := container.NewHBox(refreshButton, pauseButton)
 
 	myWindow.SetContent(container.New(layout.NewVBoxLayout(),
 		headerLabel,
 		widget.NewSeparator(),
-		scrollableContent))
-	v := MainWindowView{c, m, myWindow}
+		scrollableContent,
+		widget.NewSeparator(),
+		buttonContainer))
+	v := MainWindowView{c, m, myWindow, table}
 
+	refreshButton.OnTapped = func() {
+		c.Present()
+		v.refresh()
+	}
+	pauseButton.OnTapped = func() {
+		c.Pause()
+		v.refresh()
+	}
 	return &v
 }
 
-func (v MainWindowView) ShowMainWindow() {
+func (v *MainWindowView) ShowMainWindow() {
+	v.controller.Present()
+	v.refresh()
 	v.mainWindow.ShowAndRun()
+}
+
+func (v *MainWindowView) refresh() {
+	v.controller.Refresh()
+	v.table.Refresh()
 }
