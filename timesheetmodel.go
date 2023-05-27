@@ -1,6 +1,9 @@
 package punchclock
 
-import "time"
+import (
+	"sort"
+	"time"
+)
 
 type TimesheetModel struct {
 	records []WorkDayRecord
@@ -22,13 +25,28 @@ func (ts *TimesheetModel) GetCurrentMonth() (selected []WorkDayRecord) {
 	return selected
 }
 
+func (ts *TimesheetModel) GetPreviousMonths() (selected []WorkDayRecord) {
+	currentMonth := time.Now().Month()
+	for _, record := range ts.records {
+		if record.WorkDay.WorkStarted.Month() != currentMonth {
+			selected = append(selected, record)
+		}
+	}
+	return selected
+}
+
 func (ts *TimesheetModel) GetAllRecords() []WorkDayRecord {
 	return ts.records
 }
 
 func (ts *TimesheetModel) UpdateWorkDay(updated WorkDayRecord) {
 	index := ts.GetIndexOf(updated)
-	ts.records[index] = updated
+	if index > -1 {
+		ts.records[index] = updated
+	} else {
+		ts.records = append(ts.records, updated)
+		ts.SortRecords()
+	}
 }
 
 func (ts *TimesheetModel) GetIndexOf(day WorkDayRecord) int {
@@ -43,4 +61,10 @@ func (ts *TimesheetModel) GetIndexOf(day WorkDayRecord) int {
 
 func IsSameDay(t1 time.Time, t2 time.Time) bool {
 	return t1.Year() == t2.Year() && t1.Month() == t2.Month() && t1.Day() == t2.Day()
+}
+
+func (ts *TimesheetModel) SortRecords() {
+	sort.Slice(ts.records, func(i, j int) bool {
+		return ts.records[i].WorkDay.WorkStarted.Before(ts.records[j].WorkDay.WorkStarted)
+	})
 }

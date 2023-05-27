@@ -30,8 +30,8 @@ func TestFileHandler_SaveToFile(t *testing.T) {
 func CreateRecordsForTest() []punchclock.WorkDayRecord {
 	currentMonth := time.Now().Month()
 	workday1 := OneWorkdayPlease(time.Date(2023, currentMonth-1, 30, 8, 0, 0, 0, time.Local))
-	workday2 := OneWorkdayPlease(time.Date(2023, currentMonth, 1, 8, 0, 0, 0, time.Local))
-	workday3 := OneWorkdayPlease(time.Date(2023, currentMonth, 2, 8, 0, 0, 0, time.Local))
+	workday2 := OneWorkdayPlease(time.Date(2023, currentMonth, 2, 8, 0, 0, 0, time.Local))
+	workday3 := OneWorkdayPlease(time.Date(2023, currentMonth, 3, 8, 0, 0, 0, time.Local))
 
 	records := []punchclock.WorkDayRecord{
 		punchclock.CalculateWorkDay(workday1),
