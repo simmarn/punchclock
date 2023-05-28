@@ -5,11 +5,12 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
 const (
-	COLUMNS = 5
+	COLUMNS = 6
 )
 
 type MainWindowView struct {
@@ -31,44 +32,52 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 		func() fyne.CanvasObject {
 			label := widget.NewLabel("placeholder")
 			label.Alignment = fyne.TextAlignCenter
-			return label
+			button := widget.NewButtonWithIcon("", theme.DocumentCreateIcon(), nil)
+			button.Hide()
+			return container.NewMax(label, button)
 		},
 		func(tci widget.TableCellID, co fyne.CanvasObject) {
-			var text string
+			l := co.(*fyne.Container).Objects[0].(*widget.Label)
+			b := co.(*fyne.Container).Objects[1].(*widget.Button)
 			if tci.Row == 0 {
 				switch tci.Col {
 				case 0:
-					text = "Date"
+					l.SetText("Date")
 				case 1:
-					text = "Arrived"
+					l.SetText("Arrived")
 				case 2:
-					text = "Left"
+					l.SetText("Left")
 				case 3:
-					text = "Break Time"
+					l.SetText("Break Time")
 				case 4:
-					text = "Work Time"
+					l.SetText("Work Time")
+				case 5:
+					l.Hide()
 				}
-				co.(*widget.Label).TextStyle.Bold = true
+				l.TextStyle.Bold = true
 			} else {
 				row := tci.Row - 1
 
 				switch tci.Col {
 				case 0:
-					text = m.CurrentMonth[row].Day()
+					l.SetText(m.CurrentMonth[row].Day())
 				case 1:
-					text = m.CurrentMonth[row].Start()
+					l.SetText(m.CurrentMonth[row].Start())
 				case 2:
-					text = m.CurrentMonth[row].End()
+					l.SetText(m.CurrentMonth[row].End())
 				case 3:
-					text = m.CurrentMonth[row].Pause()
+					l.SetText(m.CurrentMonth[row].Pause())
 				case 4:
-					text = m.CurrentMonth[row].WorkingTime()
+					l.SetText(m.CurrentMonth[row].WorkingTime())
+				case 5:
+					l.Hide()
+					b.Show()
 				}
 			}
-			co.(*widget.Label).SetText(text)
 		})
+	table.SetColumnWidth(5, 30)
 	scrollableContent := container.NewScroll(table)
-	scrollableContent.SetMinSize(fyne.NewSize(COLUMNS*94, 300))
+	scrollableContent.SetMinSize(fyne.NewSize((COLUMNS-1)*94+40, 300))
 	refreshButton := widget.NewButton("Work", nil)
 	pauseButton := widget.NewButton("Pause", nil)
 	buttonContainer := container.NewHBox(refreshButton, pauseButton)
