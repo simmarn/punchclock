@@ -5,11 +5,17 @@ import (
 	"os"
 )
 
+const (
+	WORKING string = "Working"
+	PAUSED  string = "Paused"
+)
+
 type PunchclockController struct {
 	storage    RecordStorage
 	punchclock *PunchClock
 	timesheet  *TimesheetModel
 	Model      *PunchclockModel
+	Status     string
 }
 
 func NewPunchclockController(storage RecordStorage) *PunchclockController {
@@ -21,6 +27,7 @@ func NewPunchclockController(storage RecordStorage) *PunchclockController {
 	c.punchclock = NewPunchClockFromData(c.timesheet.GetToday())
 	c.Model = new(PunchclockModel)
 	c.Refresh()
+	c.Status = WORKING
 	return c
 }
 
@@ -29,10 +36,12 @@ func (c *PunchclockController) Present() {
 	today := c.punchclock.GetCurrentWorkDay()
 	c.timesheet.UpdateWorkDay(CalculateWorkDay(today))
 	c.storage.Save(c.timesheet.GetAllRecords())
+	c.Status = WORKING
 }
 
 func (c *PunchclockController) Pause() {
 	c.punchclock.Pause()
+	c.Status = PAUSED
 }
 
 func (c *PunchclockController) GetCurrentMonth() *[]WorkDayModel {
@@ -44,6 +53,11 @@ func (c *PunchclockController) GetPrevious() []WorkDayRecord {
 }
 
 func (c *PunchclockController) Refresh() {
+	if c.Status == WORKING {
+		c.Present()
+	} else {
+		c.Pause()
+	}
 	c.Model.CurrentMonth = *NewWorkDayModelSlice(c.timesheet.GetCurrentMonth())
 }
 

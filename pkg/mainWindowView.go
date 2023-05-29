@@ -1,9 +1,12 @@
 package punchclock
 
 import (
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -80,7 +83,11 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 	scrollableContent.SetMinSize(fyne.NewSize((COLUMNS-1)*94+40, 300))
 	refreshButton := widget.NewButton("Work", nil)
 	pauseButton := widget.NewButton("Pause", nil)
-	buttonContainer := container.NewHBox(refreshButton, pauseButton)
+	status := binding.NewString()
+	status.Set(c.Status)
+	statusLabel := widget.NewLabelWithData(status)
+	statusLabel.TextStyle.Bold = true
+	buttonContainer := container.NewHBox(refreshButton, pauseButton, layout.NewSpacer(), statusLabel)
 
 	myWindow.SetContent(container.New(layout.NewVBoxLayout(),
 		headerLabel,
@@ -93,11 +100,22 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 	refreshButton.OnTapped = func() {
 		c.Present()
 		v.refresh()
+		status.Set(c.Status)
 	}
 	pauseButton.OnTapped = func() {
 		c.Pause()
 		v.refresh()
+		status.Set(c.Status)
 	}
+
+	v.mainWindow.SetOnClosed(v.refresh)
+
+	go func() {
+		time.Sleep(5 * time.Minute)
+		c.Refresh()
+		v.refresh()
+	}()
+
 	return &v
 }
 
