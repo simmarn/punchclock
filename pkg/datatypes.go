@@ -27,6 +27,12 @@ func NewWorkDay(startTime time.Time) *WorkDay {
 	return day
 }
 
+func (d *WorkDay) AddPause(p WorkPause) {
+	if p.End.Sub(p.Start) > 0 {
+		d.Pauses = append(d.Pauses, p)
+	}
+}
+
 type WorkDayRecord struct {
 	WorkDay     WorkDay       `json:"WorkDay"`
 	WorkingTime time.Duration `json:"WorkingTime"`

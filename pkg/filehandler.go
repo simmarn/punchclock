@@ -22,7 +22,7 @@ func NewFileHandler(filepath string) *FileHandler {
 }
 
 func (fh *FileHandler) Save(records []WorkDayRecord) error {
-	recordsJson, err := json.Marshal(records)
+	recordsJson, err := json.MarshalIndent(records, "", "  ")
 	if err != nil {
 		return err
 	}

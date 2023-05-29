@@ -41,6 +41,8 @@ func (c *PunchclockController) Present() {
 
 func (c *PunchclockController) Pause() {
 	c.punchclock.Pause()
+	today := c.punchclock.GetCurrentWorkDay()
+	c.timesheet.UpdateWorkDay(CalculateWorkDay(today))
 	c.Status = PAUSED
 }
 

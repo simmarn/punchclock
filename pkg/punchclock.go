@@ -45,9 +45,7 @@ func (pc *PunchClock) Work() {
 
 		if !pc.currentPause.Start.IsZero() {
 			pc.currentPause.End = RoundDown(now)
-			if pc.currentPause.End.Sub(pc.currentPause.Start) > 0 {
-				pc.today.Pauses = append(pc.today.Pauses, pc.currentPause)
-			}
+			pc.today.AddPause(pc.currentPause)
 			pc.currentPause = NewWorkPause()
 		}
 
@@ -65,7 +63,15 @@ func (pc *PunchClock) Pause() {
 }
 
 func (pc *PunchClock) GetCurrentWorkDay() WorkDay {
-	return pc.today
+	if pc.currentPause.Start.IsZero() {
+		return pc.today
+	} else {
+		temp_today := pc.today
+		temp_pause := pc.currentPause
+		temp_pause.End = RoundDown(time.Now())
+		temp_today.AddPause(temp_pause)
+		return temp_today
+	}
 }
 
 func (pc *PunchClock) GetPreviousWorkDay() WorkDay {
