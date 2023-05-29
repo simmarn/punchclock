@@ -24,8 +24,8 @@ func NewPunchClock() *PunchClock {
 	now := time.Now()
 	pc := new(PunchClock)
 	today := new(WorkDay)
-	today.WorkStarted = now
-	today.WorkEnded = now
+	today.WorkStarted = RoundDown(now)
+	today.WorkEnded = RoundUp(now)
 	pauseSlice := make([]WorkPause, 0)
 	today.Pauses = pauseSlice
 	pc.today = *today
@@ -41,24 +41,26 @@ func NewPunchClockFromData(today WorkDay) *PunchClock {
 func (pc *PunchClock) Work() {
 	now := time.Now()
 	if now.Day() == pc.today.WorkStarted.Day() {
-		pc.today.WorkEnded = now
+		pc.today.WorkEnded = RoundUp(now)
 
 		if !pc.currentPause.Start.IsZero() {
-			pc.currentPause.End = now
-			pc.today.Pauses = append(pc.today.Pauses, pc.currentPause)
+			pc.currentPause.End = RoundDown(now)
+			if pc.currentPause.End.Sub(pc.currentPause.Start) > 0 {
+				pc.today.Pauses = append(pc.today.Pauses, pc.currentPause)
+			}
 			pc.currentPause = NewWorkPause()
 		}
 
 	} else {
 		pc.yesterday = pc.today
-		pc.today = *NewWorkDay(now)
+		pc.today = *NewWorkDay(RoundDown(now))
 	}
 }
 
 func (pc *PunchClock) Pause() {
 	if pc.currentPause.Start.IsZero() {
 		pc.Work()
-		pc.currentPause.Start = time.Now()
+		pc.currentPause.Start = RoundUp(time.Now())
 	}
 }
 
@@ -68,4 +70,12 @@ func (pc *PunchClock) GetCurrentWorkDay() WorkDay {
 
 func (pc *PunchClock) GetPreviousWorkDay() WorkDay {
 	return pc.yesterday
+}
+
+func RoundDown(t time.Time) time.Time {
+	return t.Truncate(5 * time.Minute)
+}
+
+func RoundUp(t time.Time) time.Time {
+	return RoundDown(t).Add(5 * time.Minute)
 }
