@@ -66,9 +66,11 @@ func (pc *PunchClock) GetCurrentWorkDay() WorkDay {
 	if pc.currentPause.Start.IsZero() {
 		return pc.today
 	} else {
+		now := time.Now()
 		temp_today := pc.today
+		temp_today.WorkEnded = RoundUp(now)
 		temp_pause := pc.currentPause
-		temp_pause.End = RoundDown(time.Now())
+		temp_pause.End = RoundDown(now)
 		temp_today.AddPause(temp_pause)
 		return temp_today
 	}

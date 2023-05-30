@@ -139,7 +139,12 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 	v.mainWindow.SetOnClosed(v.refresh)
 
 	go func() {
-		for range time.Tick(5 * time.Minute) {
+		interval := 5 * time.Minute
+		startloop := time.Now().Truncate(interval).Add(interval + time.Second)
+		c.Refresh()
+		v.refresh()
+		time.Sleep(time.Until(startloop))
+		for range time.Tick(interval) {
 			c.Refresh()
 			v.refresh()
 		}
