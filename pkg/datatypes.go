@@ -21,8 +21,8 @@ type WorkDay struct {
 
 func NewWorkDay(startTime time.Time) *WorkDay {
 	day := new(WorkDay)
-	day.WorkStarted = startTime
-	day.WorkEnded = startTime
+	day.WorkStarted = RoundDown(startTime)
+	day.WorkEnded = RoundUp(startTime)
 	day.Pauses = make([]WorkPause, 0)
 	return day
 }

@@ -17,16 +17,20 @@ const (
 )
 
 type MainWindowView struct {
-	controller *PunchclockController
-	model      *PunchclockModel
-	mainWindow fyne.Window
-	table      fyne.Widget
+	controller     *PunchclockController
+	model          *PunchclockModel
+	mainWindow     fyne.Window
+	table          fyne.Widget
+	hiddenObjects  []fyne.CanvasObject // TODO write bug on show/hide setting on windows resize
+	visibleObjects []fyne.CanvasObject
 }
 
 func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowView {
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Punchclock")
 	headerLabel := widget.NewLabel("Punchclock Timesheet")
+	var visibleObjects []fyne.CanvasObject
+	var hiddenObjects []fyne.CanvasObject
 
 	table := widget.NewTable(
 		func() (int, int) {
@@ -46,16 +50,28 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 				switch tci.Col {
 				case 0:
 					l.SetText("Date")
+					visibleObjects = append(visibleObjects, l)
+					hiddenObjects = append(hiddenObjects, b)
 				case 1:
 					l.SetText("Arrived")
+					visibleObjects = append(visibleObjects, l)
+					hiddenObjects = append(hiddenObjects, b)
 				case 2:
 					l.SetText("Left")
+					visibleObjects = append(visibleObjects, l)
+					hiddenObjects = append(hiddenObjects, b)
 				case 3:
 					l.SetText("Break Time")
+					visibleObjects = append(visibleObjects, l)
+					hiddenObjects = append(hiddenObjects, b)
 				case 4:
 					l.SetText("Work Time")
+					visibleObjects = append(visibleObjects, l)
+					hiddenObjects = append(hiddenObjects, b)
 				case 5:
 					l.Hide()
+					hiddenObjects = append(hiddenObjects, b)
+					hiddenObjects = append(hiddenObjects, b)
 				}
 				l.TextStyle.Bold = true
 			} else {
@@ -64,17 +80,29 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 				switch tci.Col {
 				case 0:
 					l.SetText(m.CurrentMonth[row].Day())
+					visibleObjects = append(visibleObjects, l)
+					hiddenObjects = append(hiddenObjects, b)
 				case 1:
 					l.SetText(m.CurrentMonth[row].Start())
+					visibleObjects = append(visibleObjects, l)
+					hiddenObjects = append(hiddenObjects, b)
 				case 2:
 					l.SetText(m.CurrentMonth[row].End())
+					visibleObjects = append(visibleObjects, l)
+					hiddenObjects = append(hiddenObjects, b)
 				case 3:
 					l.SetText(m.CurrentMonth[row].Pause())
+					visibleObjects = append(visibleObjects, l)
+					hiddenObjects = append(hiddenObjects, b)
 				case 4:
 					l.SetText(m.CurrentMonth[row].WorkingTime())
+					visibleObjects = append(visibleObjects, l)
+					hiddenObjects = append(hiddenObjects, b)
 				case 5:
 					l.Hide()
 					b.Show()
+					visibleObjects = append(visibleObjects, b)
+					hiddenObjects = append(hiddenObjects, l)
 				}
 			}
 		})
@@ -95,7 +123,7 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 		scrollableContent,
 		widget.NewSeparator(),
 		buttonContainer))
-	v := MainWindowView{c, m, myWindow, table}
+	v := MainWindowView{c, m, myWindow, table, hiddenObjects, visibleObjects}
 
 	refreshButton.OnTapped = func() {
 		c.Present()
@@ -111,9 +139,10 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 	v.mainWindow.SetOnClosed(v.refresh)
 
 	go func() {
-		time.Sleep(5 * time.Minute)
-		c.Refresh()
-		v.refresh()
+		for range time.Tick(5 * time.Minute) {
+			c.Refresh()
+			v.refresh()
+		}
 	}()
 
 	return &v
@@ -128,4 +157,11 @@ func (v *MainWindowView) ShowMainWindow() {
 func (v *MainWindowView) refresh() {
 	v.controller.Refresh()
 	v.table.Refresh()
+
+	for _, o := range v.hiddenObjects {
+		o.Hide()
+	}
+	for _, o := range v.visibleObjects {
+		o.Show()
+	}
 }
