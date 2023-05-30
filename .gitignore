@@ -1,4 +1,4 @@
 *.json
 punchclock
-fyne-cross/*
+fyne-cross
 *.tar.xz
