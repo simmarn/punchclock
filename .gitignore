@@ -1,0 +1,6 @@
+*.json
+punchclock
+fyne-cross
+*.tar.xz
+*.exe
+makefile
