@@ -1,4 +1,4 @@
-package punchclock_test
+package test
 
 import (
 	"fmt"

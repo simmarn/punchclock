@@ -1,4 +1,4 @@
-package punchclock_test
+package test
 
 import (
 	punchclock "simmarn/punchclock/pkg"
