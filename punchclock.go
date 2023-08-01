@@ -1,6 +1,6 @@
 package main
 
-import punchclock "simmarn/punchclock/pkg"
+import punchclock "github.com/simmarn/punchclock/pkg"
 
 const (
 	RECORDPATH string = "timesheet.json"

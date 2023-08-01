@@ -2,9 +2,10 @@ package test
 
 import (
 	"os"
-	punchclock "simmarn/punchclock/pkg"
 	"testing"
 	"time"
+
+	punchclock "github.com/simmarn/punchclock/pkg"
 
 	"github.com/stretchr/testify/assert"
 )

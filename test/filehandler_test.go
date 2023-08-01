@@ -1,9 +1,10 @@
 package test
 
 import (
-	punchclock "simmarn/punchclock/pkg"
 	"testing"
 	"time"
+
+	punchclock "github.com/simmarn/punchclock/pkg"
 
 	"github.com/google/go-cmp/cmp"
 )
