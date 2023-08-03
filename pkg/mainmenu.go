@@ -25,7 +25,7 @@ func SetMainMenu(metadata fyne.AppMetadata, w fyne.Window) *fyne.MainMenu {
 	link := widget.NewHyperlink(linkText, url)
 	link.Alignment = fyne.TextAlignCenter
 
-	aboutContainer := container.New(layout.NewVBoxLayout(), versionLabel, description, link)
+	aboutContainer := container.New(layout.NewVBoxLayout(), versionLabel, description, copyright, link)
 	about := fyne.NewMenuItem("About", func() {
 		dialog.ShowCustom("About", "Close", aboutContainer, w)
 	})
