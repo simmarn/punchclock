@@ -16,7 +16,7 @@ func SetMainMenu(metadata fyne.AppMetadata, w fyne.Window) *fyne.MainMenu {
 
 	versionLabel := widget.NewLabel("Punchclock v" + version)
 	versionLabel.Alignment = fyne.TextAlignCenter
-	description := widget.NewLabel("Software to help the user to record working time.")
+	description := widget.NewLabel("Software to help the user record working time.")
 	description.Alignment = fyne.TextAlignCenter
 	copyright := widget.NewLabel("Copyright (C) 2023 Martin Olausson")
 	copyright.Alignment = fyne.TextAlignCenter

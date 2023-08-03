@@ -3,7 +3,7 @@ Desktop application written in Go that assists user in recording work time.
 
 ![Punchclock screenshot](screenshot.png)
 
-Copyright (C) Martin Olausson 2023
+Copyright (C) 2023 Martin Olausson
 
 # Install
 Download latest from https://github.com/simmarn/punchclock/releases.
