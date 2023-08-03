@@ -94,6 +94,13 @@ func (c *PunchclockController) Update(day WorkDayRecord) {
 	c.timesheet.UpdateWorkDay(day)
 }
 
+func (c *PunchclockController) SetAutoPauseInterval(timeStart string, timeEnd string) error {
+	return nil
+}
+
+func (c *PunchclockController) SetAutoPause(on bool) {
+}
+
 func CheckIfError(err error) {
 	if err == nil {
 		return

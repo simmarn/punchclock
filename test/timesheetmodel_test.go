@@ -32,7 +32,7 @@ func TestTimesheetModel_UpdateWorkDay_UpdateExising(t *testing.T) {
 	worktimeBeforeEdit := ts.GetAllRecords()[1].WorkingTime
 	workstart := edited.WorkDay.WorkStarted
 	pauses := edited.WorkDay.Pauses
-	pauses = append(pauses, punchclock.WorkPause{workstart.Add(60 * time.Minute), workstart.Add(90 * time.Minute)})
+	pauses = append(pauses, punchclock.WorkPause{Start: workstart.Add(60 * time.Minute), End: workstart.Add(90 * time.Minute)})
 	edited.WorkDay.Pauses = pauses
 	edited = punchclock.CalculateWorkDay(edited.WorkDay)
 
