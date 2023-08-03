@@ -11,10 +11,11 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func SetMainMenu(metadata fyne.AppMetadata, w fyne.Window) *fyne.MainMenu {
+func ShowHamburgerMenu(metadata fyne.AppMetadata, w fyne.Window) {
 	version := metadata.Version + " build " + strconv.Itoa(metadata.Build)
+	headerText := "Punchclock v" + version
 
-	versionLabel := widget.NewLabel("Punchclock v" + version)
+	versionLabel := widget.NewLabel(headerText)
 	versionLabel.Alignment = fyne.TextAlignCenter
 	description := widget.NewLabel("Software to help the user to record working time.")
 	description.Alignment = fyne.TextAlignCenter
@@ -25,10 +26,8 @@ func SetMainMenu(metadata fyne.AppMetadata, w fyne.Window) *fyne.MainMenu {
 	link := widget.NewHyperlink(linkText, url)
 	link.Alignment = fyne.TextAlignCenter
 
-	aboutContainer := container.New(layout.NewVBoxLayout(), versionLabel, description, link)
-	about := fyne.NewMenuItem("About", func() {
-		dialog.ShowCustom("About", "Close", aboutContainer, w)
-	})
+	aboutContainer := container.New(layout.NewVBoxLayout(), versionLabel, description, copyright, link)
+	about := widget.NewButton("About", nil)
 	licenseLabel := widget.NewLabel(string(resourceLicenseTxt.Content()))
 	licenseLinkText := "https://github.com/simmarn/punchclock/blob/master/LICENSE"
 	liceseUrl, _ := url.Parse(licenseLinkText)
@@ -36,9 +35,19 @@ func SetMainMenu(metadata fyne.AppMetadata, w fyne.Window) *fyne.MainMenu {
 	licenseBox := container.New(layout.NewVBoxLayout(), licenseLabel, licenseUrlLabel)
 	licenseScroll := container.NewScroll(licenseBox)
 	licenseScroll.SetMinSize(licenseBox.MinSize())
-	license := fyne.NewMenuItem("License", func() {
+	license := widget.NewButton("License", nil)
+
+	menuContainer := container.New(layout.NewVBoxLayout(), about, license)
+	menu := dialog.NewCustom(headerText, "Dismiss", menuContainer, w)
+
+	about.OnTapped = func() {
+		menu.Hide()
+		dialog.ShowCustom("About", "Close", aboutContainer, w)
+	}
+	license.OnTapped = func() {
+		menu.Hide()
 		dialog.ShowCustom("License", "OK", licenseScroll, w)
-	})
-	mainmenu := fyne.NewMainMenu(fyne.NewMenu("...", about, license))
-	return mainmenu
+	}
+
+	menu.Show()
 }

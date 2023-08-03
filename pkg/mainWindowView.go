@@ -10,6 +10,7 @@ import (
 	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -32,7 +33,10 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 
 	headerLabel := widget.NewLabel("Punchclock Timesheet")
 	selectTimesheet := widget.NewButton(PreviousMonth.toString(), nil)
-	header := container.NewHBox(headerLabel, layout.NewSpacer(), selectTimesheet)
+	header := container.NewHBox(headerLabel, layout.NewSpacer(), selectTimesheet,
+		widget.NewButtonWithIcon("", theme.MenuIcon(), func() {
+			ShowHamburgerMenu(myApp.Metadata(), myWindow)
+		}))
 
 	table := widget.NewTable(
 		func() (int, int) {
