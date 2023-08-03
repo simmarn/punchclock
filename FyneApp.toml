@@ -1,6 +1,6 @@
 [Details]
   Icon = "Icon.png"
   Name = "Punchclock"
-  ID = "simmarn.punchclock"
+  ID = "com.github.simmarn.punchclock"
   Version = "0.9.1"
-  Build = 3
+  Build = 5
