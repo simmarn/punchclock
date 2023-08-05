@@ -29,6 +29,7 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 	myWindow := myApp.NewWindow("Punchclock")
 	myWindow.Resize(fyne.NewSize(COLUMNS*96, 600))
 	myWindow.SetMainMenu(SetMainMenu(myApp.Metadata(), myWindow))
+	v := MainWindowView{}
 
 	headerLabel := widget.NewLabel("Punchclock Timesheet")
 	selectTimesheet := widget.NewButton(PreviousMonth.toString(), nil)
@@ -80,6 +81,7 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 									m.SelectedMonth[row].SetStart(e.Text)
 									l.SetText(m.SelectedMonth[row].Start())
 									c.Update(m.SelectedMonth[row].workday)
+									v.refresh()
 								}
 							},
 							myWindow)
@@ -97,6 +99,7 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 									m.SelectedMonth[row].SetEnd(e.Text)
 									l.SetText(m.SelectedMonth[row].End())
 									c.Update(m.SelectedMonth[row].workday)
+									v.refresh()
 								}
 							},
 							myWindow)
@@ -109,6 +112,7 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 							m.SelectedMonth[row].SetPauses(p.Pauses)
 							l.SetText(m.SelectedMonth[row].Pause())
 							c.Update(m.SelectedMonth[row].workday)
+							v.refresh()
 						}
 						p.Show(&myWindow, m.SelectedMonth[row].workday.WorkDay)
 					}
@@ -132,7 +136,10 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 		nil,
 		nil,
 		table))
-	v := MainWindowView{c, m, myWindow, table}
+	v.controller = c
+	v.model = m
+	v.mainWindow = myWindow
+	v.table = table
 
 	selectTimesheet.OnTapped = func() {
 		table.ScrollToTop()
