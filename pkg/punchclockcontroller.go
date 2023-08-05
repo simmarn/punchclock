@@ -1,16 +1,22 @@
 package punchclock
 
 import (
+	"errors"
 	"fmt"
+	"math/rand"
 	"os"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 )
 
 const (
-	WORKING string = "Working"
-	PAUSED  string = "Paused"
+	WORKING             string = "Working"
+	PAUSED              string = "Paused"
+	PREFAUTOPAUSESTART  string = "PrefAutoPauseStart"
+	PREFAUTOPAUSEEND    string = "PrefAutoPauseEnd"
+	PREFAUTOPAUSEACTIVE string = "PrefAutoPauseActive"
 )
 
 type Selected uint8
@@ -39,6 +45,7 @@ type PunchclockController struct {
 	Status             string
 	displayedTimesheet Selected
 	App                fyne.App
+	autoPauseToken     int
 }
 
 func NewPunchclockController(storage RecordStorage) *PunchclockController {
@@ -53,6 +60,7 @@ func NewPunchclockController(storage RecordStorage) *PunchclockController {
 	c.Refresh()
 	c.Status = WORKING
 	c.displayedTimesheet = CurrentMonth
+	c.activateAutoPause()
 	return c
 }
 
@@ -100,10 +108,72 @@ func (c *PunchclockController) Update(day WorkDayRecord) {
 }
 
 func (c *PunchclockController) SetAutoPauseInterval(timeStart string, timeEnd string) error {
+	now := time.Now()
+	nextStartTime, err := UpdateTime(now, timeStart)
+	if err != nil {
+		return err
+	}
+	nextEndTime, err := UpdateTime(now, timeEnd)
+	if err != nil {
+		return err
+	}
+	if nextStartTime.Before(nextEndTime) {
+		c.App.Preferences().SetString(PREFAUTOPAUSESTART, timeStart)
+		c.App.Preferences().SetString(PREFAUTOPAUSEEND, timeEnd)
+	} else {
+		return errors.New("auto pause start time must be before end time")
+	}
 	return nil
 }
 
-func (c *PunchclockController) SetAutoPause(on bool) {
+func (c *PunchclockController) SetAutoPause(active bool) error {
+	start := c.App.Preferences().StringWithFallback(PREFAUTOPAUSESTART, "not set")
+	end := c.App.Preferences().StringWithFallback(PREFAUTOPAUSEEND, "not set")
+	if start == "not set" || end == "not set " {
+		return errors.New("auto pause interval not set")
+	}
+	c.App.Preferences().SetBool(PREFAUTOPAUSEACTIVE, active)
+	c.activateAutoPause()
+	return nil
+}
+
+func (c *PunchclockController) activateAutoPause() {
+	if c.App.Preferences().BoolWithFallback(PREFAUTOPAUSEACTIVE, false) {
+		now := time.Now()
+		nextStartTime, _ := UpdateTime(now, c.App.Preferences().String(PREFAUTOPAUSESTART))
+		nextEndTime, _ := UpdateTime(now, c.App.Preferences().String(PREFAUTOPAUSEEND))
+		rand.Seed(now.UnixNano())
+		token := rand.Int() // token to prevent double autopause when setting is changed
+		c.autoPauseToken = token
+
+		if now.After(nextEndTime) {
+			nextStartTime.Add(24 * time.Hour)
+			nextEndTime.Add(24 * time.Hour)
+		}
+
+		if now.After(nextStartTime) {
+			c.Pause()
+		} else {
+
+			go func() {
+				time.Sleep(time.Until(nextStartTime))
+				if c.autoPauseToken == token {
+					c.Pause()
+				}
+			}()
+		}
+
+		go func() {
+			time.Sleep(time.Until(nextEndTime))
+			if c.autoPauseToken == token {
+				c.Present()
+				c.activateAutoPause()
+			}
+		}()
+	} else {
+		c.autoPauseToken = 0
+		c.Present()
+	}
 }
 
 func CheckIfError(err error) {
