@@ -3,6 +3,9 @@ package punchclock
 import (
 	"fmt"
 	"os"
+
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
 )
 
 const (
@@ -35,10 +38,12 @@ type PunchclockController struct {
 	Model              *PunchclockModel
 	Status             string
 	displayedTimesheet Selected
+	App                fyne.App
 }
 
 func NewPunchclockController(storage RecordStorage) *PunchclockController {
 	c := new(PunchclockController)
+	c.App = app.NewWithID("com.github.simmarn.punchclock")
 	c.storage = storage
 	records, err := c.storage.Load()
 	CheckIfError(err)

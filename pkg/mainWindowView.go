@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/data/validation"
@@ -25,12 +24,10 @@ type MainWindowView struct {
 }
 
 func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowView {
-	myApp := app.New()
-	myWindow := myApp.NewWindow("Punchclock")
+	myWindow := c.App.NewWindow("Punchclock")
 	myWindow.Resize(fyne.NewSize(COLUMNS*96, 600))
-	myWindow.SetMainMenu(SetMainMenu(myApp.Metadata(), myWindow))
+	myWindow.SetMainMenu(SetMainMenu(c.App.Metadata(), myWindow))
 	v := MainWindowView{}
-
 	headerLabel := widget.NewLabel("Punchclock Timesheet")
 	selectTimesheet := widget.NewButton(PreviousMonth.toString(), nil)
 	header := container.NewHBox(headerLabel, layout.NewSpacer(), selectTimesheet)
