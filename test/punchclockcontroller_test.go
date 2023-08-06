@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/simmarn/punchclock/mocks"
+	mocks "github.com/simmarn/punchclock/mocks/github.com/simmarn/punchclock/pkg"
 	punchclock "github.com/simmarn/punchclock/pkg"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -71,7 +71,7 @@ func RemoveSettings() {
 
 func MockRecordStorage(t *testing.T) punchclock.RecordStorage {
 	mockRs := mocks.NewRecordStorage(t)
-	mockRs.On("Load").Return(CreateRecordsForTest(), nil)
-	mockRs.On("Save", mock.Anything).Return(nil)
+	mockRs.EXPECT().Load().Return(CreateRecordsForTest(), nil)
+	mockRs.EXPECT().Save(mock.Anything).Return(nil)
 	return mockRs
 }
