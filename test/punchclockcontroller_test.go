@@ -5,8 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/simmarn/punchclock/mocks"
 	punchclock "github.com/simmarn/punchclock/pkg"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 const (
@@ -19,7 +21,8 @@ func TestAutoPause(t *testing.T) {
 
 	RemoveSettings()
 
-	controller := punchclock.NewPunchclockController(new(MockedRecordStorage))
+	mockRs := MockRecordStorage(t)
+	controller := punchclock.NewPunchclockController(mockRs)
 	assert.Equal(punchclock.WORKING, controller.Status)
 
 	start := time.Now().Format(punchclock.HHMMSS24h)
@@ -53,7 +56,8 @@ func TestAutoPauseNotSet(t *testing.T) {
 	assert := assert.New(t)
 	RemoveSettings()
 
-	controller := punchclock.NewPunchclockController(new(MockedRecordStorage))
+	mockRs := MockRecordStorage(t)
+	controller := punchclock.NewPunchclockController(mockRs)
 	assert.Equal(punchclock.WORKING, controller.Status)
 
 	err := controller.SetAutoPause(true)
@@ -65,13 +69,9 @@ func RemoveSettings() {
 	cmd.Run()
 }
 
-type MockedRecordStorage struct {
-}
-
-func (fh *MockedRecordStorage) Save(records []punchclock.WorkDayRecord) error {
-	return nil
-}
-
-func (fh *MockedRecordStorage) Load() ([]punchclock.WorkDayRecord, error) {
-	return CreateRecordsForTest(), nil
+func MockRecordStorage(t *testing.T) punchclock.RecordStorage {
+	mockRs := mocks.NewRecordStorage(t)
+	mockRs.On("Load").Return(CreateRecordsForTest(), nil)
+	mockRs.On("Save", mock.Anything).Return(nil)
+	return mockRs
 }
