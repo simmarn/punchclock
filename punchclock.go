@@ -12,7 +12,7 @@ const (
 func main() {
 	app := app.NewWithID("com.github.simmarn.punchclock")
 	fh := punchclock.NewFileHandler(RECORDPATH)
-	prefs := punchclock.NewPrefHandler(app.Preferences())
+	prefs := punchclock.NewPreferencesWrapper(app.Preferences())
 	controller := punchclock.NewPunchclockController(fh, prefs, app)
 	view := punchclock.NewMainWindowView(controller, controller.Model)
 	view.ShowMainWindow()

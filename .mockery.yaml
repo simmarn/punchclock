@@ -8,4 +8,4 @@ packages:
   github.com/simmarn/punchclock/pkg:
     interfaces:
       RecordStorage:
-      PrefHandler:
+      PreferencesWrapper:

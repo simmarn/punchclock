@@ -45,10 +45,10 @@ type PunchclockController struct {
 	displayedTimesheet Selected
 	App                fyne.App
 	autoPauseToken     int
-	prefs              PrefHandler
+	prefs              PreferencesWrapper
 }
 
-func NewPunchclockController(storage RecordStorage, prefs PrefHandler, app fyne.App) *PunchclockController {
+func NewPunchclockController(storage RecordStorage, prefs PreferencesWrapper, app fyne.App) *PunchclockController {
 	c := new(PunchclockController)
 	c.App = app
 	c.prefs = prefs

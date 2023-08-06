@@ -14,11 +14,12 @@ func TestAutoPause(t *testing.T) {
 	assert := assert.New(t)
 
 	mockRs := MockRecordStorage(t)
-	mockPrefs := mocks.NewPrefHandler(t)
+	mockPrefs := mocks.NewPreferencesWrapper(t)
 	mockPrefs.EXPECT().SetString(mock.Anything, mock.Anything)
 	mockPrefs.EXPECT().SetBool(mock.Anything, mock.Anything)
 	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(false).Once()
 	controller := punchclock.NewPunchclockController(mockRs, mockPrefs, nil)
+	mockPrefs.AssertCalled(t, "GetBool", punchclock.PREFAUTOPAUSEACTIVE)
 	assert.Equal(punchclock.WORKING, controller.Status)
 
 	start := time.Now().Format(punchclock.HHMMSS24h)
@@ -26,6 +27,9 @@ func TestAutoPause(t *testing.T) {
 	mockPrefs.EXPECT().GetString(punchclock.PREFAUTOPAUSESTART).Return(start)
 	mockPrefs.EXPECT().GetString(punchclock.PREFAUTOPAUSEEND).Return(end)
 	err := controller.SetAutoPauseInterval(start, end)
+	mockPrefs.AssertCalled(t, "SetString", punchclock.PREFAUTOPAUSESTART, start)
+	mockPrefs.AssertCalled(t, "SetString", punchclock.PREFAUTOPAUSEEND, end)
+	mockPrefs.AssertNumberOfCalls(t, "SetString", 2)
 	assert.Nil(err)
 	assert.Equal(punchclock.WORKING, controller.Status)
 
@@ -44,18 +48,21 @@ func TestAutoPause(t *testing.T) {
 
 	err = controller.SetAutoPauseInterval("11:00", "11:00")
 	assert.NotNil(err)
+	mockPrefs.AssertNumberOfCalls(t, "SetString", 2)
 
 	err = controller.SetAutoPauseInterval("11:00", "12,00")
 	assert.NotNil(err)
+	mockPrefs.AssertNumberOfCalls(t, "SetString", 2)
 
 	err = controller.SetAutoPauseInterval("eleven", "12:00")
 	assert.NotNil(err)
+	mockPrefs.AssertNumberOfCalls(t, "SetString", 2)
 }
 
 func TestAutoPauseNotSet(t *testing.T) {
 	assert := assert.New(t)
 
-	mockPrefs := mocks.NewPrefHandler(t)
+	mockPrefs := mocks.NewPreferencesWrapper(t)
 	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(false)
 	mockPrefs.EXPECT().GetString(punchclock.PREFAUTOPAUSESTART).Return("")
 	mockPrefs.EXPECT().GetString(punchclock.PREFAUTOPAUSEEND).Return("")
