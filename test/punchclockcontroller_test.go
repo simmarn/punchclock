@@ -1,7 +1,6 @@
 package test
 
 import (
-	"os/exec"
 	"testing"
 	"time"
 
@@ -11,32 +10,35 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-const (
-	RemovePreferencesCommand string = "rm"
-	PreferencesLocation      string = "~/.config/fyne/com.github.simmarn.punchclock/preferences.json"
-)
-
 func TestAutoPause(t *testing.T) {
 	assert := assert.New(t)
 
-	RemoveSettings()
-
 	mockRs := MockRecordStorage(t)
-	controller := punchclock.NewPunchclockController(mockRs)
+	mockPrefs := mocks.NewPrefHandler(t)
+	mockPrefs.EXPECT().SetString(mock.Anything, mock.Anything)
+	mockPrefs.EXPECT().SetBool(mock.Anything, mock.Anything)
+	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(false).Once()
+	controller := punchclock.NewPunchclockController(mockRs, mockPrefs, nil)
 	assert.Equal(punchclock.WORKING, controller.Status)
 
 	start := time.Now().Format(punchclock.HHMMSS24h)
 	end := time.Now().Add(time.Minute).Format(punchclock.HHMMSS24h)
+	mockPrefs.EXPECT().GetString(punchclock.PREFAUTOPAUSESTART).Return(start)
+	mockPrefs.EXPECT().GetString(punchclock.PREFAUTOPAUSEEND).Return(end)
 	err := controller.SetAutoPauseInterval(start, end)
 	assert.Nil(err)
 	assert.Equal(punchclock.WORKING, controller.Status)
 
-	controller.SetAutoPause(true)
+	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(true).Once()
+	err = controller.SetAutoPause(true)
+	assert.Nil(err)
 	assert.Equal(punchclock.PAUSED, controller.Status)
 
+	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(false).Once()
 	controller.SetAutoPause(false)
 	assert.Equal(punchclock.WORKING, controller.Status)
 
+	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(true).Once()
 	controller.SetAutoPause(true)
 	assert.Equal(punchclock.PAUSED, controller.Status)
 
@@ -48,25 +50,22 @@ func TestAutoPause(t *testing.T) {
 
 	err = controller.SetAutoPauseInterval("eleven", "12:00")
 	assert.NotNil(err)
-
-	controller.SetAutoPause(false)
 }
 
 func TestAutoPauseNotSet(t *testing.T) {
 	assert := assert.New(t)
-	RemoveSettings()
+
+	mockPrefs := mocks.NewPrefHandler(t)
+	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(false)
+	mockPrefs.EXPECT().GetString(punchclock.PREFAUTOPAUSESTART).Return("")
+	mockPrefs.EXPECT().GetString(punchclock.PREFAUTOPAUSEEND).Return("")
 
 	mockRs := MockRecordStorage(t)
-	controller := punchclock.NewPunchclockController(mockRs)
+	controller := punchclock.NewPunchclockController(mockRs, mockPrefs, nil)
 	assert.Equal(punchclock.WORKING, controller.Status)
 
 	err := controller.SetAutoPause(true)
 	assert.NotNil(err)
-}
-
-func RemoveSettings() {
-	cmd := exec.Command("rm", PreferencesLocation)
-	cmd.Run()
 }
 
 func MockRecordStorage(t *testing.T) punchclock.RecordStorage {

@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
 )
 
 const (
@@ -46,11 +45,13 @@ type PunchclockController struct {
 	displayedTimesheet Selected
 	App                fyne.App
 	autoPauseToken     int
+	prefs              PrefHandler
 }
 
-func NewPunchclockController(storage RecordStorage) *PunchclockController {
+func NewPunchclockController(storage RecordStorage, prefs PrefHandler, app fyne.App) *PunchclockController {
 	c := new(PunchclockController)
-	c.App = app.NewWithID("com.github.simmarn.punchclock")
+	c.App = app
+	c.prefs = prefs
 	c.storage = storage
 	records, err := c.storage.Load()
 	CheckIfError(err)
@@ -118,8 +119,8 @@ func (c *PunchclockController) SetAutoPauseInterval(timeStart string, timeEnd st
 		return err
 	}
 	if nextStartTime.Before(nextEndTime) {
-		c.App.Preferences().SetString(PREFAUTOPAUSESTART, timeStart)
-		c.App.Preferences().SetString(PREFAUTOPAUSEEND, timeEnd)
+		c.prefs.SetString(PREFAUTOPAUSESTART, timeStart)
+		c.prefs.SetString(PREFAUTOPAUSEEND, timeEnd)
 	} else {
 		return errors.New("auto pause start time must be before end time")
 	}
@@ -127,21 +128,21 @@ func (c *PunchclockController) SetAutoPauseInterval(timeStart string, timeEnd st
 }
 
 func (c *PunchclockController) SetAutoPause(active bool) error {
-	start := c.App.Preferences().StringWithFallback(PREFAUTOPAUSESTART, "not set")
-	end := c.App.Preferences().StringWithFallback(PREFAUTOPAUSEEND, "not set")
-	if start == "not set" || end == "not set " {
+	start := c.prefs.GetString(PREFAUTOPAUSESTART)
+	end := c.prefs.GetString(PREFAUTOPAUSEEND)
+	if start == "" || end == "" {
 		return errors.New("auto pause interval not set")
 	}
-	c.App.Preferences().SetBool(PREFAUTOPAUSEACTIVE, active)
+	c.prefs.SetBool(PREFAUTOPAUSEACTIVE, active)
 	c.activateAutoPause()
 	return nil
 }
 
 func (c *PunchclockController) activateAutoPause() {
-	if c.App.Preferences().BoolWithFallback(PREFAUTOPAUSEACTIVE, false) {
+	if c.prefs.GetBool(PREFAUTOPAUSEACTIVE) {
 		now := time.Now()
-		nextStartTime, _ := UpdateTime(now, c.App.Preferences().String(PREFAUTOPAUSESTART))
-		nextEndTime, _ := UpdateTime(now, c.App.Preferences().String(PREFAUTOPAUSEEND))
+		nextStartTime, _ := UpdateTime(now, c.prefs.GetString(PREFAUTOPAUSESTART))
+		nextEndTime, _ := UpdateTime(now, c.prefs.GetString(PREFAUTOPAUSEEND))
 		rand.Seed(now.UnixNano())
 		token := rand.Int() // token to prevent double autopause when setting is changed
 		c.autoPauseToken = token
