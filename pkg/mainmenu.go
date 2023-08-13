@@ -11,8 +11,23 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func SetMainMenu(metadata fyne.AppMetadata, w fyne.Window) *fyne.MainMenu {
+func SetMainMenu(controller *PunchclockController, w fyne.Window) *fyne.MainMenu {
+	metadata := controller.App.Metadata()
 	version := metadata.Version + " build " + strconv.Itoa(metadata.Build)
+
+	autoPauseStartEntry := NewValidatedTimeEntry()
+	autoPauseStartEntry.SetText(controller.GetAutoPauseStart())
+	autoPauseEndEntry := NewValidatedTimeEntry()
+	autoPauseEndEntry.SetText(controller.GetAutoPauseEnd())
+	autoPauseChk := widget.NewCheck("Autopause", func(checked bool) {
+		controller.SetAutoPauseInterval(autoPauseStartEntry.Text, autoPauseEndEntry.Text)
+		controller.SetAutoPause(checked)
+	})
+	autoPauseChk.Checked = controller.GetAutoPause()
+	autoPauseContainer := container.New(layout.NewHBoxLayout(), autoPauseChk, autoPauseStartEntry, autoPauseEndEntry)
+	settings := fyne.NewMenuItem("Settings", func() {
+		dialog.ShowCustom("Settings", "Close", autoPauseContainer, w)
+	})
 
 	versionLabel := widget.NewLabel("Punchclock v" + version)
 	versionLabel.Alignment = fyne.TextAlignCenter
@@ -39,6 +54,6 @@ func SetMainMenu(metadata fyne.AppMetadata, w fyne.Window) *fyne.MainMenu {
 	license := fyne.NewMenuItem("License", func() {
 		dialog.ShowCustom("License", "OK", licenseScroll, w)
 	})
-	mainmenu := fyne.NewMainMenu(fyne.NewMenu("...", about, license))
+	mainmenu := fyne.NewMainMenu(fyne.NewMenu("...", about, license, settings))
 	return mainmenu
 }

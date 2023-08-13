@@ -26,7 +26,7 @@ type MainWindowView struct {
 func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowView {
 	myWindow := c.App.NewWindow("Punchclock")
 	myWindow.Resize(fyne.NewSize(COLUMNS*96, 600))
-	myWindow.SetMainMenu(SetMainMenu(c.App.Metadata(), myWindow))
+	myWindow.SetMainMenu(SetMainMenu(c, myWindow))
 	v := MainWindowView{}
 	headerLabel := widget.NewLabel("Punchclock Timesheet")
 	selectTimesheet := widget.NewButton(PreviousMonth.toString(), nil)

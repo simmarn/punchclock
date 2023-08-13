@@ -127,6 +127,14 @@ func (c *PunchclockController) SetAutoPauseInterval(timeStart string, timeEnd st
 	return nil
 }
 
+func (c *PunchclockController) GetAutoPauseStart() string {
+	return c.prefs.GetString(PREFAUTOPAUSESTART)
+}
+
+func (c *PunchclockController) GetAutoPauseEnd() string {
+	return c.prefs.GetString(PREFAUTOPAUSEEND)
+}
+
 func (c *PunchclockController) SetAutoPause(active bool) error {
 	start := c.prefs.GetString(PREFAUTOPAUSESTART)
 	end := c.prefs.GetString(PREFAUTOPAUSEEND)
@@ -136,6 +144,10 @@ func (c *PunchclockController) SetAutoPause(active bool) error {
 	c.prefs.SetBool(PREFAUTOPAUSEACTIVE, active)
 	c.activateAutoPause()
 	return nil
+}
+
+func (c *PunchclockController) GetAutoPause() bool {
+	return c.prefs.GetBool(PREFAUTOPAUSEACTIVE)
 }
 
 func (c *PunchclockController) activateAutoPause() {
