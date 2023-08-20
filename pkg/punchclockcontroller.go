@@ -155,13 +155,13 @@ func (c *PunchclockController) activateAutoPause() {
 		now := time.Now()
 		nextStartTime, _ := UpdateTime(now, c.prefs.GetString(PREFAUTOPAUSESTART))
 		nextEndTime, _ := UpdateTime(now, c.prefs.GetString(PREFAUTOPAUSEEND))
-		rand.Seed(now.UnixNano())
-		token := rand.Int() // token to prevent double autopause when setting is changed
+		random := rand.New(rand.NewSource(now.UnixNano()))
+		token := random.Int() // token to prevent double autopause when setting is changed
 		c.autoPauseToken = token
 
 		if now.After(nextEndTime) {
-			nextStartTime.Add(24 * time.Hour)
-			nextEndTime.Add(24 * time.Hour)
+			nextStartTime = nextStartTime.Add(24 * time.Hour)
+			nextEndTime = nextEndTime.Add(24 * time.Hour)
 		}
 
 		if now.After(nextStartTime) {
