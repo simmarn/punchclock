@@ -19,14 +19,16 @@ func SetMainMenu(controller *PunchclockController, w fyne.Window) *fyne.MainMenu
 	autoPauseStartEntry.SetText(controller.GetAutoPauseStart())
 	autoPauseEndEntry := NewValidatedTimeEntry()
 	autoPauseEndEntry.SetText(controller.GetAutoPauseEnd())
-	autoPauseChk := widget.NewCheck("Autopause", func(checked bool) {
-		controller.SetAutoPauseInterval(autoPauseStartEntry.Text, autoPauseEndEntry.Text)
-		controller.SetAutoPause(checked)
-	})
+	autoPauseChk := widget.NewCheck("Autopause", nil)
 	autoPauseChk.Checked = controller.GetAutoPause()
 	autoPauseContainer := container.New(layout.NewHBoxLayout(), autoPauseChk, autoPauseStartEntry, autoPauseEndEntry)
 	settings := fyne.NewMenuItem("Settings", func() {
-		dialog.ShowCustom("Settings", "Close", autoPauseContainer, w)
+		dialog := dialog.NewCustom("Settings", "Close", autoPauseContainer, w)
+		dialog.SetOnClosed(func() {
+			controller.SetAutoPauseInterval(autoPauseStartEntry.Text, autoPauseEndEntry.Text)
+			controller.SetAutoPause(autoPauseChk.Checked)
+		})
+		dialog.Show()
 	})
 
 	versionLabel := widget.NewLabel("Punchclock v" + version)

@@ -172,7 +172,7 @@ func (c *PunchclockController) activateAutoPause() {
 		} else {
 
 			go func() {
-				time.Sleep(time.Until(nextStartTime))
+				time.Sleep(time.Until(nextStartTime.Add(-time.Minute)))
 				if c.autoPauseToken == token {
 					c.Pause()
 				}
