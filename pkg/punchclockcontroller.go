@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/data/binding"
 )
 
 const (
@@ -41,7 +42,7 @@ type PunchclockController struct {
 	punchclock         *PunchClock
 	timesheet          *TimesheetModel
 	Model              *PunchclockModel
-	Status             string
+	Status             binding.String
 	displayedTimesheet Selected
 	App                fyne.App
 	autoPauseToken     int
@@ -58,8 +59,9 @@ func NewPunchclockController(storage RecordStorage, prefs PreferencesWrapper, ap
 	c.timesheet = NewTimesheetModel(records)
 	c.punchclock = NewPunchClockFromData(c.timesheet.GetToday())
 	c.Model = new(PunchclockModel)
+	c.Status = binding.NewString()
+	c.Status.Set(WORKING)
 	c.Refresh()
-	c.Status = WORKING
 	c.displayedTimesheet = CurrentMonth
 	c.activateAutoPause()
 	return c
@@ -70,14 +72,14 @@ func (c *PunchclockController) Present() {
 	today := c.punchclock.GetCurrentWorkDay()
 	c.timesheet.UpdateWorkDay(CalculateWorkDay(today))
 	c.storage.Save(c.timesheet.GetAllRecords())
-	c.Status = WORKING
+	c.Status.Set(WORKING)
 }
 
 func (c *PunchclockController) Pause() {
 	c.punchclock.Pause()
 	today := c.punchclock.GetCurrentWorkDay()
 	c.timesheet.UpdateWorkDay(CalculateWorkDay(today))
-	c.Status = PAUSED
+	c.Status.Set(PAUSED)
 }
 
 func (c *PunchclockController) ToggleSelectedMonth() string {
@@ -91,7 +93,8 @@ func (c *PunchclockController) ToggleSelectedMonth() string {
 }
 
 func (c *PunchclockController) Refresh() {
-	if c.Status == WORKING {
+	status, _ := c.Status.Get()
+	if status == WORKING {
 		c.Present()
 	} else {
 		c.Pause()

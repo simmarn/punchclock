@@ -5,7 +5,6 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
@@ -121,9 +120,7 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 	table.SetColumnWidth(5, 30)
 	refreshButton := widget.NewButton("Work", nil)
 	pauseButton := widget.NewButton("Pause", nil)
-	status := binding.NewString()
-	status.Set(c.Status)
-	statusLabel := widget.NewLabelWithData(status)
+	statusLabel := widget.NewLabelWithData(c.Status)
 	statusLabel.TextStyle.Bold = true
 	buttonContainer := container.NewHBox(refreshButton, pauseButton, layout.NewSpacer(), statusLabel)
 
@@ -148,12 +145,10 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 	refreshButton.OnTapped = func() {
 		c.Present()
 		v.refresh()
-		status.Set(c.Status)
 	}
 	pauseButton.OnTapped = func() {
 		c.Pause()
 		v.refresh()
-		status.Set(c.Status)
 	}
 
 	v.mainWindow.SetOnClosed(v.refresh)
