@@ -169,7 +169,6 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 }
 
 func (v *MainWindowView) ShowMainWindow() {
-	v.controller.Present()
 	v.refresh()
 	v.mainWindow.ShowAndRun()
 }
@@ -177,5 +176,4 @@ func (v *MainWindowView) ShowMainWindow() {
 func (v *MainWindowView) refresh() {
 	v.controller.Refresh()
 	v.table.Refresh()
-	//v.table.ScrollToBottom()
 }

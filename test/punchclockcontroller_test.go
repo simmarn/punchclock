@@ -20,7 +20,7 @@ func TestAutoPause(t *testing.T) {
 	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(false).Once()
 	controller := punchclock.NewPunchclockController(mockRs, mockPrefs, nil)
 	mockPrefs.AssertCalled(t, "GetBool", punchclock.PREFAUTOPAUSEACTIVE)
-	assert.Equal(punchclock.WORKING, controller.Status)
+	assert.Equal(punchclock.WORKING, GetStatus(controller))
 
 	start := time.Now().Format(punchclock.HHMMSS24h)
 	end := time.Now().Add(time.Minute).Format(punchclock.HHMMSS24h)
@@ -31,20 +31,20 @@ func TestAutoPause(t *testing.T) {
 	mockPrefs.AssertCalled(t, "SetString", punchclock.PREFAUTOPAUSEEND, end)
 	mockPrefs.AssertNumberOfCalls(t, "SetString", 2)
 	assert.Nil(err)
-	assert.Equal(punchclock.WORKING, controller.Status)
+	assert.Equal(punchclock.WORKING, GetStatus(controller))
 
 	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(true).Once()
 	err = controller.SetAutoPause(true)
 	assert.Nil(err)
-	assert.Equal(punchclock.PAUSED, controller.Status)
+	assert.Equal(punchclock.PAUSED, GetStatus(controller))
 
 	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(false).Once()
 	controller.SetAutoPause(false)
-	assert.Equal(punchclock.WORKING, controller.Status)
+	assert.Equal(punchclock.WORKING, GetStatus(controller))
 
 	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(true).Once()
 	controller.SetAutoPause(true)
-	assert.Equal(punchclock.PAUSED, controller.Status)
+	assert.Equal(punchclock.PAUSED, GetStatus(controller))
 
 	err = controller.SetAutoPauseInterval("11:00", "11:00")
 	assert.NotNil(err)
@@ -69,7 +69,7 @@ func TestAutoPauseNotSet(t *testing.T) {
 
 	mockRs := MockRecordStorage(t)
 	controller := punchclock.NewPunchclockController(mockRs, mockPrefs, nil)
-	assert.Equal(punchclock.WORKING, controller.Status)
+	assert.Equal(punchclock.WORKING, GetStatus(controller))
 
 	err := controller.SetAutoPause(true)
 	assert.NotNil(err)
@@ -80,4 +80,9 @@ func MockRecordStorage(t *testing.T) punchclock.RecordStorage {
 	mockRs.EXPECT().Load().Return(CreateRecordsForTest(), nil)
 	mockRs.EXPECT().Save(mock.Anything).Return(nil)
 	return mockRs
+}
+
+func GetStatus(c *punchclock.PunchclockController) string {
+	status, _ := c.Status.Get()
+	return status
 }
