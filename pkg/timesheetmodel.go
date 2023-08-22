@@ -17,15 +17,15 @@ func NewTimesheetModel(records []WorkDayRecord) *TimesheetModel {
 
 func (ts *TimesheetModel) GetToday() WorkDay {
 	if len(ts.records) > 0 {
-		if IsSameDay(time.Now(), ts.records[len(ts.records)-1].WorkDay.WorkStarted) {
+		if IsSameDay(GetNow(), ts.records[len(ts.records)-1].WorkDay.WorkStarted) {
 			return ts.records[len(ts.records)-1].WorkDay
 		}
 	}
-	return *NewWorkDay(time.Now())
+	return *NewWorkDay(GetNow())
 }
 
 func (ts *TimesheetModel) GetCurrentMonth() (selected []WorkDayRecord) {
-	currentMonth := time.Now().Month()
+	currentMonth := GetNow().Month()
 	for _, record := range ts.records {
 		if record.WorkDay.WorkStarted.Month() == currentMonth {
 			selected = append(selected, record)
@@ -35,7 +35,7 @@ func (ts *TimesheetModel) GetCurrentMonth() (selected []WorkDayRecord) {
 }
 
 func (ts *TimesheetModel) GetPreviousMonths() (selected []WorkDayRecord) {
-	currentMonth := time.Now().Month()
+	currentMonth := GetNow().Month()
 	for _, record := range ts.records {
 		if record.WorkDay.WorkStarted.Month() != currentMonth {
 			selected = append(selected, record)

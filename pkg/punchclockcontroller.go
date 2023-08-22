@@ -112,7 +112,7 @@ func (c *PunchclockController) Update(day WorkDayRecord) {
 }
 
 func (c *PunchclockController) SetAutoPauseInterval(timeStart string, timeEnd string) error {
-	now := time.Now()
+	now := GetNow()
 	nextStartTime, err := UpdateTime(now, timeStart)
 	if err != nil {
 		return err
@@ -155,7 +155,7 @@ func (c *PunchclockController) GetAutoPause() bool {
 
 func (c *PunchclockController) activateAutoPause() {
 	if c.prefs.GetBool(PREFAUTOPAUSEACTIVE) {
-		now := time.Now()
+		now := GetNow()
 		nextStartTime, _ := UpdateTime(now, c.prefs.GetString(PREFAUTOPAUSESTART))
 		nextEndTime, _ := UpdateTime(now, c.prefs.GetString(PREFAUTOPAUSEEND))
 		random := rand.New(rand.NewSource(now.UnixNano()))
