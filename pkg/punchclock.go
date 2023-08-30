@@ -5,6 +5,7 @@ import (
 )
 
 var GetNow = time.Now
+var Sleep = time.Sleep
 
 func CalculateWorkDay(workday WorkDay) WorkDayRecord {
 	record := WorkDayRecord{}

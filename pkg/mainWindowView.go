@@ -158,7 +158,7 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 		startloop := GetNow().Truncate(interval).Add(interval + time.Second)
 		c.Refresh()
 		v.refresh()
-		time.Sleep(time.Until(startloop))
+		Sleep(time.Until(startloop))
 		for range time.Tick(interval) {
 			c.Refresh()
 			v.refresh()

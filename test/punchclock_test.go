@@ -110,8 +110,10 @@ func CreateWorkDay(initTime time.Time) *punchclock.WorkDay {
 
 func FakeTimeTo(t time.Time) {
 	punchclock.GetNow = func() time.Time { return t }
+	punchclock.Sleep = func(d time.Duration) { time.Sleep(time.Second) }
 }
 
 func UnFakeTime() {
 	punchclock.GetNow = time.Now
+	punchclock.Sleep = time.Sleep
 }
