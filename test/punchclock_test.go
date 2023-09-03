@@ -46,17 +46,18 @@ func Test_Work_NewDay_WorkEndedUpdatedWithNewDate(t *testing.T) {
 	assert.Equal(initialdata.WorkEnded, pc.GetPreviousWorkDay().WorkEnded)
 }
 
-/*func Test_Pause_PauseSaved(t *testing.T) {
+func Test_Pause_PauseSaved(t *testing.T) {
 	assert := assert.New(t)
-	initialdata := CreateWorkDay(time.Now().Add(-time.Hour))
+	startTime := time.Now().Add((-time.Hour))
+	initialdata := CreateWorkDay(startTime)
 	pc := punchclock.NewPunchClockFromData(*initialdata)
-
+	FakeTimeTo(startTime.Add(10 * time.Minute))
 	pc.Pause()
 
 	assert.Greater(pc.GetCurrentWorkDay().WorkEnded, pc.GetCurrentWorkDay().WorkStarted)
 	assert.Equal(0, len(pc.GetCurrentWorkDay().Pauses))
 
-	time.Sleep(1 * time.Second)
+	FakeTimeTo(startTime.Add(30 * time.Minute))
 	pc.Work()
 	assert.Equal(1, len(pc.GetCurrentWorkDay().Pauses))
 
@@ -66,10 +67,12 @@ func Test_Work_NewDay_WorkEndedUpdatedWithNewDate(t *testing.T) {
 	pc.Pause()
 	pc.Pause()
 	pc.Pause()
-	time.Sleep(1 * time.Second)
+	FakeTimeTo(startTime.Add(50 * time.Minute))
 	pc.Work()
 	assert.Equal(2, len(pc.GetCurrentWorkDay().Pauses))
-}*/
+
+	UnFakeTime()
+}
 
 func Test_SetCurrentWorkDay_NoCurrent_Ignored(t *testing.T) {
 	assert := assert.New(t)
@@ -103,4 +106,14 @@ func CreateWorkDay(initTime time.Time) *punchclock.WorkDay {
 	pauseSlice := make([]punchclock.WorkPause, 0)
 	today.Pauses = pauseSlice
 	return today
+}
+
+func FakeTimeTo(t time.Time) {
+	punchclock.GetNow = func() time.Time { return t }
+	punchclock.Sleep = func(d time.Duration) { time.Sleep(time.Second) }
+}
+
+func UnFakeTime() {
+	punchclock.GetNow = time.Now
+	punchclock.Sleep = time.Sleep
 }

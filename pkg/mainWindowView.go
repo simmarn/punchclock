@@ -4,9 +4,7 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
@@ -25,12 +23,10 @@ type MainWindowView struct {
 }
 
 func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowView {
-	myApp := app.New()
-	myWindow := myApp.NewWindow("Punchclock")
+	myWindow := c.App.NewWindow("Punchclock")
 	myWindow.Resize(fyne.NewSize(COLUMNS*96, 600))
-	myWindow.SetMainMenu(SetMainMenu(myApp.Metadata(), myWindow))
+	myWindow.SetMainMenu(SetMainMenu(c, myWindow))
 	v := MainWindowView{}
-
 	headerLabel := widget.NewLabel("Punchclock Timesheet")
 	selectTimesheet := widget.NewButton(PreviousMonth.toString(), nil)
 	header := container.NewHBox(headerLabel, layout.NewSpacer(), selectTimesheet)
@@ -124,9 +120,7 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 	table.SetColumnWidth(5, 30)
 	refreshButton := widget.NewButton("Work", nil)
 	pauseButton := widget.NewButton("Pause", nil)
-	status := binding.NewString()
-	status.Set(c.Status)
-	statusLabel := widget.NewLabelWithData(status)
+	statusLabel := widget.NewLabelWithData(c.Status)
 	statusLabel.TextStyle.Bold = true
 	buttonContainer := container.NewHBox(refreshButton, pauseButton, layout.NewSpacer(), statusLabel)
 
@@ -151,22 +145,20 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 	refreshButton.OnTapped = func() {
 		c.Present()
 		v.refresh()
-		status.Set(c.Status)
 	}
 	pauseButton.OnTapped = func() {
 		c.Pause()
 		v.refresh()
-		status.Set(c.Status)
 	}
 
 	v.mainWindow.SetOnClosed(v.refresh)
 
 	go func() {
 		interval := 5 * time.Minute
-		startloop := time.Now().Truncate(interval).Add(interval + time.Second)
+		startloop := GetNow().Truncate(interval).Add(interval + time.Second)
 		c.Refresh()
 		v.refresh()
-		time.Sleep(time.Until(startloop))
+		Sleep(time.Until(startloop))
 		for range time.Tick(interval) {
 			c.Refresh()
 			v.refresh()
@@ -177,7 +169,6 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 }
 
 func (v *MainWindowView) ShowMainWindow() {
-	v.controller.Present()
 	v.refresh()
 	v.mainWindow.ShowAndRun()
 }
@@ -185,5 +176,4 @@ func (v *MainWindowView) ShowMainWindow() {
 func (v *MainWindowView) refresh() {
 	v.controller.Refresh()
 	v.table.Refresh()
-	//v.table.ScrollToBottom()
 }

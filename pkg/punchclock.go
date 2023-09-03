@@ -4,6 +4,9 @@ import (
 	"time"
 )
 
+var GetNow = time.Now
+var Sleep = time.Sleep
+
 func CalculateWorkDay(workday WorkDay) WorkDayRecord {
 	record := WorkDayRecord{}
 	record.WorkDay = workday
@@ -21,7 +24,7 @@ type PunchClock struct {
 }
 
 func NewPunchClock() *PunchClock {
-	now := time.Now()
+	now := GetNow()
 	pc := new(PunchClock)
 	today := new(WorkDay)
 	today.WorkStarted = RoundDown(now)
@@ -39,7 +42,7 @@ func NewPunchClockFromData(today WorkDay) *PunchClock {
 }
 
 func (pc *PunchClock) Work() {
-	now := time.Now()
+	now := GetNow()
 	if now.Day() == pc.today.WorkStarted.Day() {
 		pc.today.WorkEnded = RoundUp(now)
 
@@ -58,7 +61,7 @@ func (pc *PunchClock) Work() {
 func (pc *PunchClock) Pause() {
 	if pc.currentPause.Start.IsZero() {
 		pc.Work()
-		pc.currentPause.Start = RoundUp(time.Now())
+		pc.currentPause.Start = RoundUp(GetNow())
 	}
 }
 
@@ -66,7 +69,7 @@ func (pc *PunchClock) GetCurrentWorkDay() WorkDay {
 	if pc.currentPause.Start.IsZero() {
 		return pc.today
 	} else {
-		now := time.Now()
+		now := GetNow()
 		temp_today := pc.today
 		temp_today.WorkEnded = RoundUp(now)
 		temp_pause := pc.currentPause

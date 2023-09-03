@@ -8,5 +8,5 @@ import "fyne.io/fyne/v2"
 var resourceLicenseTxt = &fyne.StaticResource{
 	StaticName: "license.txt",
 	StaticContent: []byte(
-		"This program is free software: you can redistribute it and/or\nmodify it under the terms of the GNU General Public License as\npublished by the Free Software Foundation, either version 3 of\nthe License, or (at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied\nwarranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR\nPURPOSE.  See the GNU General Public License for more \ndetails.\n\nYou should have received a copy of the GNU General Public\nLicense along with this program.  If not, see"),
+		"This program is free software: you can redistribute it and/or\nmodify it under the terms of the GNU General Public License as\npublished by the Free Software Foundation, either version 3 of\nthe License, or (at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied\nwarranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR\nPURPOSE.  See the GNU General Public License for more \ndetails.\n\nYou should have received a copy of the GNU General Public\nLicense along with this program.  If not, visit link below."),
 }

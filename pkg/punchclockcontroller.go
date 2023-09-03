@@ -1,13 +1,22 @@
 package punchclock
 
 import (
+	"errors"
 	"fmt"
+	"math/rand"
 	"os"
+	"time"
+
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/data/binding"
 )
 
 const (
-	WORKING string = "Working"
-	PAUSED  string = "Paused"
+	WORKING             string = "Working"
+	PAUSED              string = "Paused"
+	PREFAUTOPAUSESTART  string = "PrefAutoPauseStart"
+	PREFAUTOPAUSEEND    string = "PrefAutoPauseEnd"
+	PREFAUTOPAUSEACTIVE string = "PrefAutoPauseActive"
 )
 
 type Selected uint8
@@ -33,21 +42,28 @@ type PunchclockController struct {
 	punchclock         *PunchClock
 	timesheet          *TimesheetModel
 	Model              *PunchclockModel
-	Status             string
+	Status             binding.String
 	displayedTimesheet Selected
+	App                fyne.App
+	autoPauseToken     int
+	prefs              PreferencesWrapper
 }
 
-func NewPunchclockController(storage RecordStorage) *PunchclockController {
+func NewPunchclockController(storage RecordStorage, prefs PreferencesWrapper, app fyne.App) *PunchclockController {
 	c := new(PunchclockController)
+	c.App = app
+	c.prefs = prefs
 	c.storage = storage
 	records, err := c.storage.Load()
 	CheckIfError(err)
 	c.timesheet = NewTimesheetModel(records)
 	c.punchclock = NewPunchClockFromData(c.timesheet.GetToday())
 	c.Model = new(PunchclockModel)
+	c.Status = binding.NewString()
+	c.Status.Set(WORKING)
 	c.Refresh()
-	c.Status = WORKING
 	c.displayedTimesheet = CurrentMonth
+	c.activateAutoPause()
 	return c
 }
 
@@ -56,14 +72,14 @@ func (c *PunchclockController) Present() {
 	today := c.punchclock.GetCurrentWorkDay()
 	c.timesheet.UpdateWorkDay(CalculateWorkDay(today))
 	c.storage.Save(c.timesheet.GetAllRecords())
-	c.Status = WORKING
+	c.Status.Set(WORKING)
 }
 
 func (c *PunchclockController) Pause() {
 	c.punchclock.Pause()
 	today := c.punchclock.GetCurrentWorkDay()
 	c.timesheet.UpdateWorkDay(CalculateWorkDay(today))
-	c.Status = PAUSED
+	c.Status.Set(PAUSED)
 }
 
 func (c *PunchclockController) ToggleSelectedMonth() string {
@@ -77,7 +93,8 @@ func (c *PunchclockController) ToggleSelectedMonth() string {
 }
 
 func (c *PunchclockController) Refresh() {
-	if c.Status == WORKING {
+	status, _ := c.Status.Get()
+	if status == WORKING {
 		c.Present()
 	} else {
 		c.Pause()
@@ -92,6 +109,87 @@ func (c *PunchclockController) Refresh() {
 func (c *PunchclockController) Update(day WorkDayRecord) {
 	c.punchclock.SetCurrentWorkDay(day.WorkDay)
 	c.timesheet.UpdateWorkDay(day)
+}
+
+func (c *PunchclockController) SetAutoPauseInterval(timeStart string, timeEnd string) error {
+	now := GetNow()
+	nextStartTime, err := UpdateTime(now, timeStart)
+	if err != nil {
+		return err
+	}
+	nextEndTime, err := UpdateTime(now, timeEnd)
+	if err != nil {
+		return err
+	}
+	if nextStartTime.Before(nextEndTime) {
+		c.prefs.SetString(PREFAUTOPAUSESTART, timeStart)
+		c.prefs.SetString(PREFAUTOPAUSEEND, timeEnd)
+	} else {
+		return errors.New("auto pause start time must be before end time")
+	}
+	return nil
+}
+
+func (c *PunchclockController) GetAutoPauseStart() string {
+	return c.prefs.GetString(PREFAUTOPAUSESTART)
+}
+
+func (c *PunchclockController) GetAutoPauseEnd() string {
+	return c.prefs.GetString(PREFAUTOPAUSEEND)
+}
+
+func (c *PunchclockController) SetAutoPause(active bool) error {
+	start := c.prefs.GetString(PREFAUTOPAUSESTART)
+	end := c.prefs.GetString(PREFAUTOPAUSEEND)
+	if start == "" || end == "" {
+		return errors.New("auto pause interval not set")
+	}
+	c.prefs.SetBool(PREFAUTOPAUSEACTIVE, active)
+	c.activateAutoPause()
+	return nil
+}
+
+func (c *PunchclockController) GetAutoPause() bool {
+	return c.prefs.GetBool(PREFAUTOPAUSEACTIVE)
+}
+
+func (c *PunchclockController) activateAutoPause() {
+	if c.prefs.GetBool(PREFAUTOPAUSEACTIVE) {
+		now := GetNow()
+		nextStartTime, _ := UpdateTime(now, c.prefs.GetString(PREFAUTOPAUSESTART))
+		nextEndTime, _ := UpdateTime(now, c.prefs.GetString(PREFAUTOPAUSEEND))
+		random := rand.New(rand.NewSource(now.UnixNano()))
+		token := random.Int() // token to prevent double autopause when setting is changed
+		c.autoPauseToken = token
+
+		if now.After(nextEndTime) {
+			nextStartTime = nextStartTime.Add(24 * time.Hour)
+			nextEndTime = nextEndTime.Add(24 * time.Hour)
+		}
+
+		if now.After(nextStartTime) {
+			c.Pause()
+		} else {
+
+			go func() {
+				Sleep(time.Until(nextStartTime.Add(-time.Minute)))
+				if c.autoPauseToken == token {
+					c.Pause()
+				}
+			}()
+		}
+
+		go func() {
+			Sleep(time.Until(nextEndTime))
+			if c.autoPauseToken == token {
+				c.Present()
+				c.activateAutoPause()
+			}
+		}()
+	} else {
+		c.autoPauseToken = 0
+		c.Present()
+	}
 }
 
 func CheckIfError(err error) {

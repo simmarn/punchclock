@@ -1,5 +1,5 @@
 *.json
-punchclock
+/punchclock
 fyne-cross
 *.tar.xz
 *.exe
