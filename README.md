@@ -8,7 +8,8 @@ Copyright (C) 2023 Martin Olausson
 # Install
 Download latest from https://github.com/simmarn/punchclock/releases.
 
-Unpack and execute binary.
+Unpack and move binary to desired folder.
+Execute binary.
 
 # Build from source
 1. Install the Fyne toolkit according to https://developer.fyne.io/started/.
