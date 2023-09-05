@@ -1,6 +1,7 @@
 package punchclock
 
 import (
+	"strconv"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -24,16 +25,16 @@ type MainWindowView struct {
 
 func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowView {
 	myWindow := c.App.NewWindow("Punchclock")
-	myWindow.Resize(fyne.NewSize(COLUMNS*96, 600))
+	myWindow.Resize(fyne.NewSize(COLUMNS*99, 600))
 	myWindow.SetMainMenu(SetMainMenu(c, myWindow))
 	v := MainWindowView{}
 	headerLabel := widget.NewLabel("Punchclock Timesheet")
 	selectTimesheet := widget.NewButton(PreviousMonth.toString(), nil)
 	header := container.NewHBox(headerLabel, layout.NewSpacer(), selectTimesheet)
 
-	table := widget.NewTable(
+	table := widget.NewTableWithHeaders(
 		func() (int, int) {
-			return len(m.SelectedMonth) + 1, COLUMNS
+			return len(m.SelectedMonth), COLUMNS
 		},
 		func() fyne.CanvasObject {
 			label := NewTappableLabel("placeholder", nil)
@@ -42,82 +43,87 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 		},
 		func(tci widget.TableCellID, co fyne.CanvasObject) {
 			l := co.(*TappableLabel)
-			if tci.Row == 0 {
-				switch tci.Col {
-				case 0:
-					l.SetText("Date")
-				case 1:
-					l.SetText("Arrived")
-				case 2:
-					l.SetText("Left")
-				case 3:
-					l.SetText("Break Time")
-				case 4:
-					l.SetText("Work Time")
-				case 5:
-					l.Hide()
-				}
-				l.TextStyle.Bold = true
-			} else {
-				row := tci.Row - 1
+			row := tci.Row
 
-				switch tci.Col {
-				case 0:
-					l.SetText(m.SelectedMonth[row].Day())
-				case 1:
-					l.SetText(m.SelectedMonth[row].Start())
-					l.OnTapped = func() {
-						e := widget.NewEntry()
-						e.Text = l.Text
-						e.Validator = validation.NewTime(HHMMSS24h)
-						formItem := widget.NewFormItem("Arrived", e)
-						dialog.ShowForm(m.SelectedMonth[row].Day(), "Submit", "Cancel", []*widget.FormItem{formItem},
-							func(b bool) {
-								if b && e.Validate() == nil {
-									m.SelectedMonth[row].SetStart(e.Text)
-									l.SetText(m.SelectedMonth[row].Start())
-									c.Update(m.SelectedMonth[row].workday)
-									v.refresh()
-								}
-							},
-							myWindow)
-					}
-				case 2:
-					l.SetText(m.SelectedMonth[row].End())
-					l.OnTapped = func() {
-						e := widget.NewEntry()
-						e.Text = l.Text
-						e.Validator = validation.NewTime(HHMMSS24h)
-						formItem := widget.NewFormItem("Left", e)
-						dialog.ShowForm(m.SelectedMonth[row].Day(), "Submit", "Cancel", []*widget.FormItem{formItem},
-							func(b bool) {
-								if b && e.Validate() == nil {
-									m.SelectedMonth[row].SetEnd(e.Text)
-									l.SetText(m.SelectedMonth[row].End())
-									c.Update(m.SelectedMonth[row].workday)
-									v.refresh()
-								}
-							},
-							myWindow)
-					}
-				case 3:
-					l.SetText(m.SelectedMonth[row].Pause())
-					l.OnTapped = func() {
-						p := new(EditBreakTimeView)
-						p.OnSubmitted = func() {
-							m.SelectedMonth[row].SetPauses(p.Pauses)
-							l.SetText(m.SelectedMonth[row].Pause())
-							c.Update(m.SelectedMonth[row].workday)
-							v.refresh()
-						}
-						p.Show(&myWindow, m.SelectedMonth[row].workday.WorkDay)
-					}
-				case 4:
-					l.SetText(m.SelectedMonth[row].WorkingTime())
+			switch tci.Col {
+			case 0:
+				l.SetText(m.SelectedMonth[row].Day())
+			case 1:
+				l.SetText(m.SelectedMonth[row].Start())
+				l.OnTapped = func() {
+					e := widget.NewEntry()
+					e.Text = l.Text
+					e.Validator = validation.NewTime(HHMMSS24h)
+					formItem := widget.NewFormItem("Arrived", e)
+					dialog.ShowForm(m.SelectedMonth[row].Day(), "Submit", "Cancel", []*widget.FormItem{formItem},
+						func(b bool) {
+							if b && e.Validate() == nil {
+								m.SelectedMonth[row].SetStart(e.Text)
+								l.SetText(m.SelectedMonth[row].Start())
+								c.Update(m.SelectedMonth[row].workday)
+								v.refresh()
+							}
+						},
+						myWindow)
 				}
+			case 2:
+				l.SetText(m.SelectedMonth[row].End())
+				l.OnTapped = func() {
+					e := widget.NewEntry()
+					e.Text = l.Text
+					e.Validator = validation.NewTime(HHMMSS24h)
+					formItem := widget.NewFormItem("Left", e)
+					dialog.ShowForm(m.SelectedMonth[row].Day(), "Submit", "Cancel", []*widget.FormItem{formItem},
+						func(b bool) {
+							if b && e.Validate() == nil {
+								m.SelectedMonth[row].SetEnd(e.Text)
+								l.SetText(m.SelectedMonth[row].End())
+								c.Update(m.SelectedMonth[row].workday)
+								v.refresh()
+							}
+						},
+						myWindow)
+				}
+			case 3:
+				l.SetText(m.SelectedMonth[row].Pause())
+				l.OnTapped = func() {
+					p := new(EditBreakTimeView)
+					p.OnSubmitted = func() {
+						m.SelectedMonth[row].SetPauses(p.Pauses)
+						l.SetText(m.SelectedMonth[row].Pause())
+						c.Update(m.SelectedMonth[row].workday)
+						v.refresh()
+					}
+					p.Show(&myWindow, m.SelectedMonth[row].workday.WorkDay)
+				}
+			case 4:
+				l.SetText(m.SelectedMonth[row].WorkingTime())
 			}
 		})
 	table.SetColumnWidth(5, 30)
+	table.CreateHeader = func() fyne.CanvasObject {
+		return widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+	}
+	table.UpdateHeader = func(id widget.TableCellID, template fyne.CanvasObject) {
+		if id.Row == -1 {
+			switch id.Col {
+			case 0:
+				template.(*widget.Label).SetText("Date")
+			case 1:
+				template.(*widget.Label).SetText("Arrived")
+			case 2:
+				template.(*widget.Label).SetText("Left")
+			case 3:
+				template.(*widget.Label).SetText("Break Time")
+			case 4:
+				template.(*widget.Label).SetText("Work Time")
+			}
+		}
+		if id.Col == -1 {
+			template.(*widget.Label).SetText(strconv.Itoa(id.Row + 1))
+		}
+	}
+	table.ShowHeaderColumn = false
 	refreshButton := widget.NewButton("Work", nil)
 	pauseButton := widget.NewButton("Pause", nil)
 	statusLabel := widget.NewLabelWithData(c.Status)
