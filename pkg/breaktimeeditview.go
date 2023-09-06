@@ -69,7 +69,7 @@ func (v *EditBreakTimeView) Show(parent *fyne.Window, day WorkDay) {
 			newEnd.Clear()
 		}
 	})
-	addList := container.New(layout.NewHBoxLayout(), widget.NewLabel("New pause"), newStart, newEnd, add)
+	addList := container.New(layout.NewGridLayout(4), widget.NewLabel("New pause"), newStart, newEnd, add)
 	dialogGui := container.NewBorder(widget.NewLabel("Pauses"), addList, nil, nil, scroll)
 
 	dialog.ShowCustomConfirm("Edit break time", "Submit", "Cancel", dialogGui, func(b bool) {

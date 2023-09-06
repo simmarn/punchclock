@@ -21,7 +21,7 @@ func SetMainMenu(controller *PunchclockController, w fyne.Window) *fyne.MainMenu
 	autoPauseEndEntry.SetText(controller.GetAutoPauseEnd())
 	autoPauseChk := widget.NewCheck("Autopause", nil)
 	autoPauseChk.Checked = controller.GetAutoPause()
-	autoPauseContainer := container.New(layout.NewHBoxLayout(), autoPauseChk, autoPauseStartEntry, autoPauseEndEntry)
+	autoPauseContainer := container.New(layout.NewGridLayout(3), autoPauseChk, autoPauseStartEntry, autoPauseEndEntry)
 	settings := fyne.NewMenuItem("Settings", func() {
 		dialog := dialog.NewCustom("Settings", "Close", autoPauseContainer, w)
 		dialog.SetOnClosed(func() {
