@@ -2,9 +2,7 @@ package punchclock
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
-	"os"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -55,7 +53,7 @@ func NewPunchclockController(storage RecordStorage, prefs PreferencesWrapper, ap
 	c.prefs = prefs
 	c.storage = storage
 	records, err := c.storage.Load()
-	CheckIfError(err)
+	TerminateOnIoReadError(app, err)
 	c.timesheet = NewTimesheetModel(records)
 	c.punchclock = NewPunchClockFromData(c.timesheet.GetToday())
 	c.Model = new(PunchclockModel)
@@ -190,13 +188,4 @@ func (c *PunchclockController) activateAutoPause() {
 		c.autoPauseToken = 0
 		c.Present()
 	}
-}
-
-func CheckIfError(err error) {
-	if err == nil {
-		return
-	}
-
-	fmt.Printf("\x1b[31;1m%s\x1b[0m\n", fmt.Sprintf("error: %s", err))
-	os.Exit(1)
 }

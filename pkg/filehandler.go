@@ -11,6 +11,8 @@ type RecordStorage interface {
 	Load() ([]WorkDayRecord, error)
 }
 
+var FilePath string
+
 type FileHandler struct {
 	filepath string
 }
@@ -18,6 +20,7 @@ type FileHandler struct {
 func NewFileHandler(filepath string) *FileHandler {
 	fh := new(FileHandler)
 	fh.filepath = filepath
+	FilePath = filepath
 	return fh
 }
 
