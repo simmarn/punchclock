@@ -165,6 +165,9 @@ func (c *PunchclockController) activateAutoPause() {
 			nextEndTime = nextEndTime.Add(24 * time.Hour)
 		}
 
+		Log.Info().Msg("Auto pause will start " + nextStartTime.Format(time.RFC3339))
+		Log.Info().Msg("Auto pause will end " + nextEndTime.Format(time.RFC3339))
+
 		if now.After(nextStartTime) {
 			Log.Info().Msg("Auto pausing...")
 			c.Pause()

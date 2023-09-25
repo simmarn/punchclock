@@ -1,4 +1,4 @@
-package punchclock
+package logging
 
 import (
 	"io"

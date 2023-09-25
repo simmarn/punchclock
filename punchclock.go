@@ -2,6 +2,7 @@ package main
 
 import (
 	"fyne.io/fyne/v2/app"
+	"github.com/simmarn/punchclock/logging"
 	punchclock "github.com/simmarn/punchclock/pkg"
 )
 
@@ -10,7 +11,7 @@ const (
 )
 
 func main() {
-	punchclock.Log = punchclock.Configure(punchclock.Config{
+	punchclock.Log = logging.Configure(logging.Config{
 		FileLoggingEnabled:    true,
 		EncodeLogsAsJson:      true,
 		ConsoleLoggingEnabled: false,

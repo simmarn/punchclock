@@ -2,11 +2,13 @@ package punchclock
 
 import (
 	"time"
+
+	"github.com/simmarn/punchclock/logging"
 )
 
 var GetNow = time.Now
 var Sleep = time.Sleep
-var Log *Logger
+var Log *logging.Logger
 
 func CalculateWorkDay(workday WorkDay) WorkDayRecord {
 	record := WorkDayRecord{}
