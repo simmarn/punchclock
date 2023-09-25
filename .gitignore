@@ -4,3 +4,4 @@ fyne-cross
 *.tar.xz
 *.exe
 makefile
+*.log

@@ -6,6 +6,7 @@ import (
 
 var GetNow = time.Now
 var Sleep = time.Sleep
+var Log *Logger
 
 func CalculateWorkDay(workday WorkDay) WorkDayRecord {
 	record := WorkDayRecord{}

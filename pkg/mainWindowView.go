@@ -157,7 +157,7 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 		v.refresh()
 	}
 
-	v.mainWindow.SetOnClosed(v.refresh)
+	v.mainWindow.SetOnClosed(v.onClosed)
 
 	go func() {
 		interval := 5 * time.Minute
@@ -182,4 +182,9 @@ func (v *MainWindowView) ShowMainWindow() {
 func (v *MainWindowView) refresh() {
 	v.controller.Refresh()
 	v.table.Refresh()
+}
+
+func (v *MainWindowView) onClosed() {
+	Log.Info().Msg("Closing " + v.controller.App.UniqueID())
+	v.refresh()
 }

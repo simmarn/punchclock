@@ -166,12 +166,14 @@ func (c *PunchclockController) activateAutoPause() {
 		}
 
 		if now.After(nextStartTime) {
+			Log.Info().Msg("Auto pausing...")
 			c.Pause()
 		} else {
 
 			go func() {
 				Sleep(time.Until(nextStartTime.Add(-time.Minute)))
 				if c.autoPauseToken == token {
+					Log.Info().Msg("Auto pausing...")
 					c.Pause()
 				}
 			}()
@@ -180,12 +182,14 @@ func (c *PunchclockController) activateAutoPause() {
 		go func() {
 			Sleep(time.Until(nextEndTime))
 			if c.autoPauseToken == token {
+				Log.Info().Msg("Auto pause ended")
 				c.Present()
 				c.activateAutoPause()
 			}
 		}()
 	} else {
 		c.autoPauseToken = 0
+		Log.Info().Msg("Auto pause disabled")
 		c.Present()
 	}
 }
