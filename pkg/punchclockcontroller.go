@@ -183,7 +183,7 @@ func (c *PunchclockController) activateAutoPause() {
 		}
 
 		go func() {
-			Sleep(time.Until(nextEndTime))
+			Sleep(time.Until(nextEndTime.Add(5 * time.Second)))
 			if c.autoPauseToken == token {
 				Log.Info().Msg("Auto pause ended")
 				c.Present()
