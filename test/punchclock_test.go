@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/simmarn/punchclock/logging"
 	punchclock "github.com/simmarn/punchclock/pkg"
 
 	"github.com/stretchr/testify/assert"
@@ -12,7 +13,7 @@ import (
 
 func TestMain(m *testing.M) {
 	// Write code here to run before tests
-
+	SetNoLogging()
 	// Run tests
 	exitVal := m.Run()
 
@@ -116,4 +117,8 @@ func FakeTimeTo(t time.Time) {
 func UnFakeTime() {
 	punchclock.GetNow = time.Now
 	punchclock.Sleep = time.Sleep
+}
+
+func SetNoLogging() {
+	punchclock.Log = logging.Configure(logging.Config{})
 }

@@ -95,7 +95,7 @@ func fmtDurationDecimal(d time.Duration) string {
 	h := d / time.Hour
 	d -= h * time.Hour
 	m := d / time.Minute
-	return fmt.Sprintf("%02d,%02d", h, 100*m/60)
+	return fmt.Sprintf("%02d.%02d", h, 100*m/60)
 }
 
 func UpdateTime(baseTime time.Time, s string) (time.Time, error) {
