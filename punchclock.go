@@ -25,7 +25,7 @@ func main() {
 	fh := punchclock.NewFileHandler(RECORDPATH)
 	prefs := punchclock.NewPreferencesWrapper(app.Preferences())
 	controller := punchclock.NewPunchclockController(fh, prefs, app)
-	view := punchclock.NewMainWindowView(controller, controller.Model)
+	view := punchclock.NewMainWindowView(controller)
 	punchclock.Log.Info().Msg("Starting " + app.UniqueID())
 	view.ShowMainWindow()
 }

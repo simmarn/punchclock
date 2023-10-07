@@ -23,10 +23,11 @@ type MainWindowView struct {
 	table      *widget.Table
 }
 
-func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowView {
+func NewMainWindowView(c *PunchclockController) *MainWindowView {
 	myWindow := c.App.NewWindow("Punchclock")
 	myWindow.Resize(fyne.NewSize(COLUMNS*99, 600))
 	myWindow.SetMainMenu(SetMainMenu(c, myWindow))
+	m := c.Model
 	v := MainWindowView{}
 	headerLabel := widget.NewLabel("Punchclock Timesheet")
 	selectTimesheet := widget.NewButton(PreviousMonth.toString(), nil)

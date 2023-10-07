@@ -66,13 +66,31 @@ func TestAutoPauseNotSet(t *testing.T) {
 	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(false)
 	mockPrefs.EXPECT().GetString(punchclock.PREFAUTOPAUSESTART).Return("")
 	mockPrefs.EXPECT().GetString(punchclock.PREFAUTOPAUSEEND).Return("")
-
 	mockRs := MockRecordStorage(t)
+
 	controller := punchclock.NewPunchclockController(mockRs, mockPrefs, nil)
 	assert.Equal(punchclock.WORKING, GetStatus(controller))
 
 	err := controller.SetAutoPause(true)
 	assert.NotNil(err)
+}
+
+func TestAddNewDay(t *testing.T) {
+	assert := assert.New(t)
+
+	mockPrefs := mocks.NewPreferencesWrapper(t)
+	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(false)
+	mocksRs := MockRecordStorage(t)
+
+	controller := punchclock.NewPunchclockController(mocksRs, mockPrefs, nil)
+
+	month := controller.Model.SelectedMonth
+	assert.Equal(3, len(month))
+
+	newDay := OneWorkdayPlease(time.Date(2023, time.Now().Month(), 1, 8, 0, 0, 0, time.Local))
+	controller.Update(punchclock.CalculateWorkDay(newDay))
+	controller.Refresh()
+	assert.Equal(4, len(controller.Model.SelectedMonth))
 }
 
 func MockRecordStorage(t *testing.T) punchclock.RecordStorage {
