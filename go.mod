@@ -3,7 +3,7 @@ module github.com/simmarn/punchclock
 go 1.18
 
 require (
-	fyne.io/fyne/v2 v2.4.0
+	fyne.io/fyne/v2 v2.4.1
 	github.com/google/go-cmp v0.5.9
 	github.com/stretchr/testify v1.8.4
 )
@@ -26,7 +26,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/rs/zerolog v1.31.0 // indirect
+	github.com/rs/zerolog v1.31.0
 	github.com/srwiley/oksvg v0.0.0-20221011165216-be6e8873101c // indirect
 	github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
