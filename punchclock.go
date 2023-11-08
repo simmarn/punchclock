@@ -12,7 +12,7 @@ const (
 
 func main() {
 	punchclock.Log = logging.Configure(logging.Config{
-		FileLoggingEnabled:    true,
+		FileLoggingEnabled:    false,
 		EncodeLogsAsJson:      true,
 		ConsoleLoggingEnabled: false,
 		Directory:             ".",
