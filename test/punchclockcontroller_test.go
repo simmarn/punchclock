@@ -93,6 +93,35 @@ func TestAddNewDay(t *testing.T) {
 	assert.Equal(4, len(controller.Model.SelectedMonth))
 }
 
+func TestGetUnworkedDayBefore(t *testing.T) {
+	assert := assert.New(t)
+
+	mockPrefs := mocks.NewPreferencesWrapper(t)
+	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(false)
+	mocksRs := MockRecordStorage(t)
+
+	controller := punchclock.NewPunchclockController(mocksRs, mockPrefs, nil)
+
+	month := controller.Model.SelectedMonth
+	assert.Equal(3, len(month))
+
+	lastDay := month[len(month)-1].GetDay()
+
+	unworkedDay := controller.GetUnworkedDayBefore(lastDay)
+
+	assert.Less(unworkedDay.WorkEnded, lastDay)
+	controller.Update(punchclock.CalculateWorkDay(*unworkedDay))
+	controller.Refresh()
+	assert.Equal(4, len(controller.Model.SelectedMonth))
+
+	unworkedDay = controller.GetUnworkedDayBefore(lastDay)
+
+	assert.Less(unworkedDay.WorkEnded, lastDay)
+	controller.Update(punchclock.CalculateWorkDay(*unworkedDay))
+	controller.Refresh()
+	assert.Equal(5, len(controller.Model.SelectedMonth))
+}
+
 func MockRecordStorage(t *testing.T) punchclock.RecordStorage {
 	mockRs := mocks.NewRecordStorage(t)
 	mockRs.EXPECT().Load().Return(CreateRecordsForTest(), nil)

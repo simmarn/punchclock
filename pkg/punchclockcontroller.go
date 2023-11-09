@@ -196,3 +196,7 @@ func (c *PunchclockController) activateAutoPause() {
 		c.Present()
 	}
 }
+
+func (c *PunchclockController) GetUnworkedDayBefore(t time.Time) *WorkDay {
+	return NewWorkDay(t.Add(-24 * time.Hour))
+}

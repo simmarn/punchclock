@@ -27,6 +27,10 @@ func NewWorkDayModelSlice(records []WorkDayRecord) *[]WorkDayModel {
 	return &modelSlice
 }
 
+func (m *WorkDayModel) GetDay() time.Time {
+	return m.workday.WorkDay.WorkStarted
+}
+
 func (m *WorkDayModel) Day() string {
 	return m.workday.WorkDay.WorkStarted.Format(YYYYMMDD)
 }
