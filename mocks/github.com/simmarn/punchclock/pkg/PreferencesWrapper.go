@@ -59,6 +59,49 @@ func (_c *PreferencesWrapper_GetBool_Call) RunAndReturn(run func(string) bool) *
 	return _c
 }
 
+// GetFloatWithFallback provides a mock function with given fields: _a0, _a1
+func (_m *PreferencesWrapper) GetFloatWithFallback(_a0 string, _a1 float64) float64 {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 float64
+	if rf, ok := ret.Get(0).(func(string, float64) float64); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		r0 = ret.Get(0).(float64)
+	}
+
+	return r0
+}
+
+// PreferencesWrapper_GetFloatWithFallback_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFloatWithFallback'
+type PreferencesWrapper_GetFloatWithFallback_Call struct {
+	*mock.Call
+}
+
+// GetFloatWithFallback is a helper method to define mock.On call
+//   - _a0 string
+//   - _a1 float64
+func (_e *PreferencesWrapper_Expecter) GetFloatWithFallback(_a0 interface{}, _a1 interface{}) *PreferencesWrapper_GetFloatWithFallback_Call {
+	return &PreferencesWrapper_GetFloatWithFallback_Call{Call: _e.mock.On("GetFloatWithFallback", _a0, _a1)}
+}
+
+func (_c *PreferencesWrapper_GetFloatWithFallback_Call) Run(run func(_a0 string, _a1 float64)) *PreferencesWrapper_GetFloatWithFallback_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(float64))
+	})
+	return _c
+}
+
+func (_c *PreferencesWrapper_GetFloatWithFallback_Call) Return(_a0 float64) *PreferencesWrapper_GetFloatWithFallback_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *PreferencesWrapper_GetFloatWithFallback_Call) RunAndReturn(run func(string, float64) float64) *PreferencesWrapper_GetFloatWithFallback_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetString provides a mock function with given fields: _a0
 func (_m *PreferencesWrapper) GetString(_a0 string) string {
 	ret := _m.Called(_a0)
@@ -131,6 +174,40 @@ func (_c *PreferencesWrapper_SetBool_Call) Return() *PreferencesWrapper_SetBool_
 }
 
 func (_c *PreferencesWrapper_SetBool_Call) RunAndReturn(run func(string, bool)) *PreferencesWrapper_SetBool_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetFloat provides a mock function with given fields: _a0, _a1
+func (_m *PreferencesWrapper) SetFloat(_a0 string, _a1 float64) {
+	_m.Called(_a0, _a1)
+}
+
+// PreferencesWrapper_SetFloat_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetFloat'
+type PreferencesWrapper_SetFloat_Call struct {
+	*mock.Call
+}
+
+// SetFloat is a helper method to define mock.On call
+//   - _a0 string
+//   - _a1 float64
+func (_e *PreferencesWrapper_Expecter) SetFloat(_a0 interface{}, _a1 interface{}) *PreferencesWrapper_SetFloat_Call {
+	return &PreferencesWrapper_SetFloat_Call{Call: _e.mock.On("SetFloat", _a0, _a1)}
+}
+
+func (_c *PreferencesWrapper_SetFloat_Call) Run(run func(_a0 string, _a1 float64)) *PreferencesWrapper_SetFloat_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(float64))
+	})
+	return _c
+}
+
+func (_c *PreferencesWrapper_SetFloat_Call) Return() *PreferencesWrapper_SetFloat_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *PreferencesWrapper_SetFloat_Call) RunAndReturn(run func(string, float64)) *PreferencesWrapper_SetFloat_Call {
 	_c.Call.Return(run)
 	return _c
 }

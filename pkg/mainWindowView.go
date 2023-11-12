@@ -13,7 +13,9 @@ import (
 )
 
 const (
-	COLUMNS = 5
+	COLUMNS              = 5
+	PREFAPPWIDTH  string = "ApplicationWidth"
+	PREFAPPHEIGHT string = "ApplicationHeight"
 )
 
 type MainWindowView struct {
@@ -25,7 +27,9 @@ type MainWindowView struct {
 
 func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowView {
 	myWindow := c.App.NewWindow("Punchclock")
-	myWindow.Resize(fyne.NewSize(COLUMNS*99, 600))
+	width := c.prefs.GetFloatWithFallback(PREFAPPWIDTH, COLUMNS*99)
+	height := c.prefs.GetFloatWithFallback(PREFAPPHEIGHT, 600)
+	myWindow.Resize(fyne.NewSize(float32(width), float32(height)))
 	myWindow.SetMainMenu(SetMainMenu(c, myWindow))
 	v := MainWindowView{}
 	headerLabel := widget.NewLabel("Punchclock Timesheet")
@@ -186,5 +190,7 @@ func (v *MainWindowView) refresh() {
 
 func (v *MainWindowView) onClosed() {
 	Log.Info().Msg("Closing " + v.controller.App.UniqueID())
+	v.controller.prefs.SetFloat(PREFAPPWIDTH, float64(v.mainWindow.Canvas().Size().Width))
+	v.controller.prefs.SetFloat(PREFAPPHEIGHT, float64(v.mainWindow.Canvas().Size().Height))
 	v.refresh()
 }
