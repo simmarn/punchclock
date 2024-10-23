@@ -43,8 +43,12 @@ func (m *WorkDayModel) Pause() string {
 	return fmtDuration(m.workday.PauseTime)
 }
 
-func (m *WorkDayModel) WorkingTime() string {
+func (m *WorkDayModel) WorkingDecimalFormat() string {
 	return fmtDurationDecimal(m.workday.WorkingTime)
+}
+
+func (m *WorkDayModel) WorkingTimeClockFormat() string {
+	return fmtDuration(m.workday.WorkingTime)
 }
 
 func (m *WorkDayModel) SetPauses(pauses []WorkPause) {

@@ -101,7 +101,11 @@ func NewMainWindowView(c *PunchclockController, m *PunchclockModel) *MainWindowV
 					p.Show(&myWindow, m.SelectedMonth[row].workday.WorkDay)
 				}
 			case 4:
-				l.SetText(m.SelectedMonth[row].WorkingTime())
+				l.SetText(m.GetWorkingTime(row))
+				l.OnTapped = func() {
+					m.ToggleTimeFormat()
+					v.refresh()
+				}
 			}
 		})
 	table.SetColumnWidth(5, 30)
