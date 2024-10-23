@@ -1,6 +1,6 @@
 module github.com/simmarn/punchclock
 
-go 1.22
+go 1.21
 
 require (
 	fyne.io/fyne/v2 v2.5.2
