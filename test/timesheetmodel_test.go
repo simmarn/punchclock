@@ -12,13 +12,13 @@ import (
 
 func TestTimesheetModel_GetCurrentMonth(t *testing.T) {
 	assert := assert.New(t)
-	records := CreateRecordsForTest()
+	records := CreateRecordsForTestWithSameMonthLastYear()
 
 	timesheet := punchclock.NewTimesheetModel(records)
 
 	currentMonth := timesheet.GetCurrentMonth()
 	assert.Equal(2, len(currentMonth))
-	assert.Equal(3, len(timesheet.GetAllRecords()))
+	assert.Equal(4, len(timesheet.GetAllRecords()))
 	assert.Equal(1, len(timesheet.GetPreviousMonths()))
 }
 

@@ -27,7 +27,8 @@ func (ts *TimesheetModel) GetToday() WorkDay {
 func (ts *TimesheetModel) GetCurrentMonth() (selected []WorkDayRecord) {
 	currentMonth := GetNow().Month()
 	for _, record := range ts.records {
-		if record.WorkDay.WorkStarted.Month() == currentMonth {
+		if record.WorkDay.WorkStarted.Month() == currentMonth &&
+			record.WorkDay.WorkStarted.Year() == GetNow().Year() {
 			selected = append(selected, record)
 		}
 	}
