@@ -3,7 +3,7 @@ module github.com/simmarn/punchclock
 go 1.21.0
 
 require (
-	fyne.io/fyne/v2 v2.5.3
+	fyne.io/fyne/v2 v2.5.4
 	github.com/google/go-cmp v0.6.0
 	github.com/stretchr/testify v1.10.0
 )
@@ -11,6 +11,7 @@ require (
 require (
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/jeandeaual/go-locale v0.0.0-20240223122105-ce5225dcaa49 // indirect
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.4.0 // indirect
 	github.com/rymdport/portal v0.3.0 // indirect
 )
