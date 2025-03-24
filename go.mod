@@ -3,7 +3,7 @@ module github.com/simmarn/punchclock
 go 1.21.0
 
 require (
-	fyne.io/fyne/v2 v2.5.4
+	fyne.io/fyne/v2 v2.5.5
 	github.com/google/go-cmp v0.7.0
 	github.com/stretchr/testify v1.10.0
 )
