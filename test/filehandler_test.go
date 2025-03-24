@@ -31,7 +31,7 @@ func TestFileHandler_SaveToFile(t *testing.T) {
 func CreateRecordsForTest() []punchclock.WorkDayRecord {
 	currentYear := time.Now().Year()
 	currentMonth := time.Now().Month()
-	workday1 := OneWorkdayPlease(time.Date(currentYear, currentMonth-1, 30, 8, 0, 0, 0, time.Local))
+	workday1 := OneWorkdayPlease(time.Date(currentYear, currentMonth-1, 28, 8, 0, 0, 0, time.Local))
 	workday2 := OneWorkdayPlease(time.Date(currentYear, currentMonth, 2, 8, 0, 0, 0, time.Local))
 	workday3 := OneWorkdayPlease(time.Date(currentYear, currentMonth, 3, 8, 0, 0, 0, time.Local))
 
@@ -46,7 +46,7 @@ func CreateRecordsForTestWithSameMonthLastYear() []punchclock.WorkDayRecord {
 	currentYear := time.Now().Year()
 	currentMonth := time.Now().Month()
 	workday0 := OneWorkdayPlease(time.Date(currentYear-1, currentMonth, 29, 8, 0, 0, 0, time.Local))
-	workday1 := OneWorkdayPlease(time.Date(currentYear, currentMonth-1, 30, 8, 0, 0, 0, time.Local))
+	workday1 := OneWorkdayPlease(time.Date(currentYear, currentMonth-1, 28, 8, 0, 0, 0, time.Local))
 	workday2 := OneWorkdayPlease(time.Date(currentYear, currentMonth, 2, 8, 0, 0, 0, time.Local))
 	workday3 := OneWorkdayPlease(time.Date(currentYear, currentMonth, 3, 8, 0, 0, 0, time.Local))
 
