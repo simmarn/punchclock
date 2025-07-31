@@ -12,21 +12,6 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func waitForStatus(c *punchclock.PunchclockController, expected string, t *testing.T) {
-	deadline := time.Now().Add(500 * time.Millisecond)
-	for time.Now().Before(deadline) {
-		status, _ := c.Status.Get()
-		if status == expected {
-			return
-		}
-		time.Sleep(10 * time.Millisecond)
-	}
-	status, _ := c.Status.Get()
-	if status != expected {
-		t.Fatalf("expected status %s, got %s", expected, status)
-	}
-}
-
 func TestAutoPause(t *testing.T) {
 	app := test.NewApp()
 	defer app.Quit()
@@ -39,7 +24,6 @@ func TestAutoPause(t *testing.T) {
 	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(false).Once()
 	controller := punchclock.NewPunchclockController(mockRs, mockPrefs, nil)
 	mockPrefs.AssertCalled(t, "GetBool", punchclock.PREFAUTOPAUSEACTIVE)
-	waitForStatus(controller, punchclock.WORKING, t)
 	assert.Equal(punchclock.WORKING, GetStatus(controller))
 
 	start := time.Now().Format(punchclock.HHMMSS24h)
@@ -51,23 +35,19 @@ func TestAutoPause(t *testing.T) {
 	mockPrefs.AssertCalled(t, "SetString", punchclock.PREFAUTOPAUSEEND, end)
 	mockPrefs.AssertNumberOfCalls(t, "SetString", 2)
 	assert.Nil(err)
-	waitForStatus(controller, punchclock.WORKING, t)
 	assert.Equal(punchclock.WORKING, GetStatus(controller))
 
 	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(true).Once()
 	err = controller.SetAutoPause(true)
 	assert.Nil(err)
-	waitForStatus(controller, punchclock.PAUSED, t)
 	assert.Equal(punchclock.PAUSED, GetStatus(controller))
 
 	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(false).Once()
 	controller.SetAutoPause(false)
-	waitForStatus(controller, punchclock.WORKING, t)
 	assert.Equal(punchclock.WORKING, GetStatus(controller))
 
 	mockPrefs.EXPECT().GetBool(punchclock.PREFAUTOPAUSEACTIVE).Return(true).Once()
 	controller.SetAutoPause(true)
-	waitForStatus(controller, punchclock.PAUSED, t)
 	assert.Equal(punchclock.PAUSED, GetStatus(controller))
 
 	err = controller.SetAutoPauseInterval("11:00", "11:00")
