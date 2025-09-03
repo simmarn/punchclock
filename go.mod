@@ -7,7 +7,7 @@ toolchain go1.23.7
 require (
 	fyne.io/fyne/v2 v2.6.3
 	github.com/google/go-cmp v0.7.0
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 )
 
 require (
